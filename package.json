@@ -27,7 +27,10 @@
 		"docker:build:web": "turbo run build --filter=web",
 		"docker:build:api": "turbo run build --filter=api",
 		"clean": "turbo run clean",
-		"ngrok": "ngrok http 4101"
+		"ngrok": "ngrok http 4101",
+		"release:check": "bun run check-types && bun run lint && bun run build",
+		"release:version": "echo 'v1.0.0'",
+		"release:tag": "git tag -a v1.0.0 -m 'Release v1.0.0' && git push origin v1.0.0"
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1",
