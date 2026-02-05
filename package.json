@@ -1,6 +1,6 @@
 {
 	"name": "turbostack",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"packageManager": "bun@1.1.45",
 	"scripts": {
@@ -29,8 +29,8 @@
 		"clean": "turbo run clean",
 		"ngrok": "ngrok http 4101",
 		"release:check": "bun run check-types && bun run lint && bun run build",
-		"release:version": "echo 'v1.0.0'",
-		"release:tag": "git tag -a v1.0.0 -m 'Release v1.0.0' && git push origin v1.0.0"
+		"release:version": "echo 'v1.0.1'",
+		"release:tag": "git tag -a v1.0.1 -m 'Release v1.0.1' && git push origin v1.0.1"
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1",
