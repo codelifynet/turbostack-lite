@@ -1,0 +1,291 @@
+---
+title: Authentication
+description: Complete authentication system with JWT and sessions
+---
+
+# Authentication
+
+TurboStack includes a **production-ready authentication system** with JWT tokens, sessions, email verification, and password reset.
+
+<Frame caption="Authentication Flow Overview">
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant F as 🖥️ Frontend
+    participant A as ⚡ API
+    participant D as 🗄️ Database
+    participant E as 📧 Email
+
+    U->>F: Enter credentials
+    F->>A: POST /auth/login
+    A->>D: Verify user & password
+    D-->>A: User found
+    A->>A: Generate JWT + Refresh Token
+    A->>A: Create Session
+    A-->>F: Tokens + Set Cookies
+    F->>F: Store in memory
+    F-->>U: Redirect to dashboard
+
+````
+</Frame>
+
+---
+
+## Features
+
+<CardGroup cols={3}>
+  <Card title="JWT Tokens" icon="key">
+    Short-lived access tokens with refresh mechanism
+  </Card>
+  <Card title="Session Management" icon="id-card">
+    Secure httpOnly cookie-based sessions
+  </Card>
+  <Card title="Email Verification" icon="envelope-circle-check">
+    Verify users before granting full access
+  </Card>
+  <Card title="Password Reset" icon="rotate-left">
+    Secure token-based password recovery
+  </Card>
+  <Card title="Rate Limiting" icon="shield">
+    Protection against brute force attacks
+  </Card>
+  <Card title="Argon2 Hashing" icon="lock">
+    Industry-standard password security
+  </Card>
+</CardGroup>
+
+---
+
+## API Endpoints
+
+| Endpoint                | Method | Description              | Auth Required |
+| ----------------------- | ------ | ------------------------ | ------------- |
+| `/auth/register`        | POST   | Create new account       | ❌            |
+| `/auth/login`           | POST   | Authenticate user        | ❌            |
+| `/auth/logout`          | POST   | End session              | ✅            |
+| `/auth/refresh`         | POST   | Refresh access token     | 🍪 Cookie     |
+| `/auth/me`              | GET    | Get current user         | ✅            |
+| `/auth/verify-email`    | GET    | Verify email address     | ❌            |
+| `/auth/forgot-password` | POST   | Request password reset   | ❌            |
+| `/auth/reset-password`  | POST   | Reset password           | ❌            |
+
+---
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Register" icon="user-plus">
+    ```typescript
+    const response = await fetch("http://localhost:4101/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "user@example.com",
+        name: "John Doe",
+        password: "securepassword123",
+      }),
+    });
+
+    const data = await response.json();
+    // {
+    //   success: true,
+    //   message: "Registration successful. Check your email.",
+    //   data: { user: { id, email, name } }
+    // }
+    ```
+  </Tab>
+  <Tab title="Login" icon="right-to-bracket">
+    ```typescript
+    const response = await fetch("http://localhost:4101/auth/login", {
+      method: "POST",
+      credentials: "include", // Important for cookies!
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "user@example.com",
+        password: "securepassword123",
+      }),
+    });
+
+    const data = await response.json();
+    // {
+    //   success: true,
+    //   data: {
+    //     user: { id, email, name, role },
+    //     accessToken: "eyJhbG..."
+    //   }
+    // }
+    ```
+  </Tab>
+  <Tab title="Protected Request" icon="shield-halved">
+    ```typescript
+    const response = await fetch("http://localhost:4101/auth/me", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+      },
+    });
+
+    const data = await response.json();
+    // { success: true, data: { user: {...} } }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Token Management
+
+<AccordionGroup>
+  <Accordion title="Access Token (JWT)" icon="key" defaultOpen>
+    | Property      | Value                                      |
+    | ------------- | ------------------------------------------ |
+    | **Lifetime**  | 15 minutes                                 |
+    | **Storage**   | Memory (not persisted)                     |
+    | **Usage**     | API requests via `Authorization` header    |
+    | **Contains**  | userId, email, role, expiry                |
+
+    ```typescript
+    // Payload structure
+    {
+      sub: "user_123",         // User ID
+      email: "user@example.com",
+      role: "USER",
+      iat: 1704067200,         // Issued at
+      exp: 1704068100          // Expires (15 min)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Refresh Token" icon="rotate">
+    | Property      | Value                              |
+    | ------------- | ---------------------------------- |
+    | **Lifetime**  | 7 days                             |
+    | **Storage**   | httpOnly cookie                    |
+    | **Usage**     | Get new access tokens              |
+    | **Security**  | httpOnly, secure, sameSite=lax     |
+  </Accordion>
+
+  <Accordion title="Session Token" icon="id-card">
+    | Property      | Value                              |
+    | ------------- | ---------------------------------- |
+    | **Lifetime**  | 7 days                             |
+    | **Storage**   | httpOnly cookie                    |
+    | **Usage**     | Backend session validation         |
+    | **Security**  | httpOnly, secure, sameSite=lax     |
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Security Features
+
+### Password Hashing
+
+Uses **Argon2** - the winner of the Password Hashing Competition:
+
+```typescript
+import { hash, verify } from "@node-rs/argon2";
+
+// Hashing
+const hashedPassword = await hash(password, {
+  memoryCost: 65536,  // 64MB
+  timeCost: 3,        // 3 iterations
+  parallelism: 4,     // 4 parallel threads
+});
+
+// Verification
+const isValid = await verify(hashedPassword, password);
+````
+
+### Rate Limiting
+
+Authentication endpoints are protected:
+
+```typescript
+const authRateLimiter = rateLimit({
+  duration: 60 * 1000, // 1 minute window
+  max: 5, // 5 attempts max
+  scoping: "scoped", // Per-IP limiting
+});
+```
+
+<Warning>
+  After 5 failed login attempts, the IP is blocked for 1 minute. This prevents
+  brute force attacks.
+</Warning>
+
+---
+
+## Email Verification Flow
+
+<Steps>
+  <Step title="User Registers">Account created with `emailVerified: null`</Step>
+  <Step title="Verification Email Sent">
+    Email with unique token sent via Resend
+  </Step>
+  <Step title="User Clicks Link">`GET /auth/verify-email?token=xxx`</Step>
+  <Step title="Email Verified">
+    `emailVerified` updated to current timestamp
+  </Step>
+</Steps>
+
+---
+
+## Password Reset Flow
+
+<Steps>
+  <Step title="User Requests Reset">
+    `POST /auth/forgot-password` with email
+  </Step>
+  <Step title="Reset Email Sent">
+    Email with secure reset link (valid 1 hour)
+  </Step>
+  <Step title="User Sets New Password">
+    `POST /auth/reset-password` with token & new password
+  </Step>
+  <Step title="Password Updated">Old sessions invalidated, user can login</Step>
+</Steps>
+
+---
+
+## Environment Variables
+
+```bash
+# JWT Configuration
+JWT_SECRET=your-super-secret-key-min-32-chars
+
+# Session Configuration
+SESSION_SECRET=another-super-secret-key
+
+# Email (for verification & reset)
+RESEND_API_KEY=re_your_api_key
+FROM_EMAIL=noreply@yourdomain.com
+
+# App Configuration
+APP_NAME=TurboStack
+FRONTEND_URL=http://localhost:4100
+NODE_ENV=development
+```
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="DO" icon="check" color="#22c55e">
+    - ✅ Use HTTPS in production - ✅ Require email verification - ✅ Implement
+    rate limiting - ✅ Use httpOnly cookies - ✅ Rotate tokens regularly - ✅
+    Hash passwords with Argon2
+  </Card>
+  <Card title="DON'T" icon="xmark" color="#ef4444">
+    - ❌ Store tokens in localStorage - ❌ Send passwords in URL - ❌ Skip input
+    validation - ❌ Use weak JWT secrets - ❌ Disable rate limiting - ❌ Log
+    sensitive data
+  </Card>
+</CardGroup>
+
+<Tip>
+  Use the built-in `AuthGuard` component on the frontend to protect pages that
+  require authentication.
+</Tip>

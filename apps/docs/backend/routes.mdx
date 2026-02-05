@@ -1,0 +1,101 @@
+---
+title: Routes
+description: Creating API routes in Elysia.js
+---
+
+# API Routes
+
+Learn how to create and organize routes in Elysia.js.
+
+## Basic Route
+
+```typescript
+import { Elysia } from "elysia";
+
+const app = new Elysia()
+  .get("/hello", () => "Hello World")
+  .post("/users", ({ body }) => createUser(body))
+  .listen(4101);
+```
+
+## Route Groups
+
+Group related routes with a prefix:
+
+```typescript
+// routes/users.ts
+import { Elysia, t } from "elysia";
+
+export const userRoutes = new Elysia({ prefix: "/users" })
+  .get("/", () => ({ users: [] }))
+  .get("/:id", ({ params }) => ({ id: params.id }))
+  .post("/", ({ body }) => ({ created: body }));
+```
+
+## Request Validation
+
+Use `t` for type-safe validation:
+
+```typescript
+import { Elysia, t } from "elysia";
+
+new Elysia().post(
+  "/users",
+  ({ body }) => {
+    // body is fully typed
+    return { name: body.name, email: body.email };
+  },
+  {
+    body: t.Object({
+      name: t.String({ minLength: 2 }),
+      email: t.String({ format: "email" }),
+      password: t.String({ minLength: 6 }),
+    }),
+  }
+);
+```
+
+## Query Parameters
+
+```typescript
+new Elysia().get(
+  "/users",
+  ({ query }) => {
+    const { page, limit } = query;
+    return { page, limit };
+  },
+  {
+    query: t.Object({
+      page: t.Optional(t.Number({ minimum: 1 })),
+      limit: t.Optional(t.Number({ minimum: 1, maximum: 100 })),
+    }),
+  }
+);
+```
+
+## OpenAPI Documentation
+
+Add metadata to routes for Swagger:
+
+```typescript
+new Elysia().get("/health", () => ({ status: "healthy" }), {
+  detail: {
+    tags: ["Health"],
+    summary: "Health check",
+    description: "Check if the API is running",
+  },
+});
+```
+
+## Composing Routes
+
+Import and use route modules:
+
+```typescript
+// src/index.ts
+import { Elysia } from "elysia";
+import { userRoutes } from "./routes/users.js";
+import { authRoutes } from "./routes/auth.js";
+
+new Elysia().use(userRoutes).use(authRoutes).listen(4101);
+```

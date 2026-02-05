@@ -1,0 +1,336 @@
+---
+title: "Authentication Errors"
+description: "Common Better Auth and authentication errors in TurboStack"
+---
+
+# Authentication Errors
+
+This page covers common authentication-related errors when working with Better Auth in TurboStack.
+
+## Invalid Password Hash
+
+### Error Message
+
+```
+BetterAuthError: Invalid password hash
+```
+
+### Cause
+
+This occurs when password hashing algorithms don't match between stored passwords and verification. Better Auth uses `scrypt` by default, not Argon2 or bcrypt.
+
+### Solution
+
+When creating users programmatically, use Better Auth's hash function:
+
+```typescript
+import { hashPassword } from "better-auth/crypto";
+
+// Hash password before storing
+const hashedPassword = await hashPassword(plainPassword);
+
+// Store in Account table with providerId: "credential"
+await prisma.account.create({
+  data: {
+    accountId: user.id,
+    providerId: "credential",
+    userId: user.id,
+    password: hashedPassword,
+  },
+});
+```
+
+<Warning>
+  Never use custom hash algorithms (like Argon2 or bcrypt) for Better Auth
+  passwords unless you configure Better Auth to use the same algorithm.
+</Warning>
+
+### Configuring Custom Hash Algorithm
+
+If you need to use a different algorithm, configure it in Better Auth:
+
+```typescript
+// lib/auth.ts
+import { hash, verify } from "@node-rs/argon2";
+
+export const auth = betterAuth({
+  // ...
+  emailAndPassword: {
+    enabled: true,
+    password: {
+      hash: async (password) => hash(password, { ... }),
+      verify: async ({ hash, password }) => verify(hash, password, { ... }),
+    },
+  },
+});
+```
+
+---
+
+## Credential Account Not Found
+
+### Error Message
+
+```
+Credential account not found
+```
+
+### Cause
+
+Better Auth stores credentials in the `Account` table, not the `User` table. When a user is created without an associated credential account, login fails.
+
+### Solution
+
+When creating users via admin panel or API, ensure you create both:
+
+1. User record in `user` table
+2. Account record in `account` table with `providerId: "credential"`
+
+```typescript
+import { hashPassword } from "better-auth/crypto";
+
+const hashedPassword = await hashPassword(data.password);
+
+const user = await prisma.$transaction(async (tx) => {
+  // 1. Create user
+  const newUser = await tx.user.create({
+    data: {
+      email: data.email,
+      name: data.name,
+      emailVerified: true,
+    },
+  });
+
+  // 2. Create credential account
+  await tx.account.create({
+    data: {
+      accountId: newUser.id,
+      providerId: "credential",
+      userId: newUser.id,
+      password: hashedPassword,
+    },
+  });
+
+  return newUser;
+});
+```
+
+---
+
+## Session Not Found / Unauthorized
+
+### Error Message
+
+```
+UNAUTHORIZED: Unauthorized
+```
+
+### Cause
+
+1. Session cookie is missing or expired
+2. Session doesn't exist in database
+3. Cookie is not being sent with requests
+
+### Solution
+
+**Check cookie configuration:**
+
+```typescript
+// Ensure credentials are included in fetch
+const response = await fetch("/api/profile", {
+  credentials: "include", // Important!
+});
+```
+
+**Check CORS configuration:**
+
+```typescript
+// backend/src/index.ts
+.use(cors({
+  origin: env.CORS_ORIGIN,
+  credentials: true, // Important!
+}))
+```
+
+**Verify session in database:**
+
+```bash
+# Open Prisma Studio
+bun run db:studio
+# Check "session" table
+```
+
+---
+
+## OAuth Callback Error
+
+### Error Message
+
+```
+OAuth callback failed: state mismatch
+```
+
+### Cause
+
+1. Session state was lost between redirect
+2. Cookie settings prevent state persistence
+3. Multiple tabs causing state conflicts
+
+### Solution
+
+**Check cookie settings:**
+
+```typescript
+// lib/auth.ts
+export const auth = betterAuth({
+  session: {
+    cookieName: "turbostack_session",
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5, // 5 minutes
+    },
+  },
+});
+```
+
+**Verify OAuth callback URL:**
+
+Ensure callback URL matches exactly what's configured in OAuth provider:
+
+- Google: `http://localhost:4101/api/auth/callback/google`
+- GitHub: `http://localhost:4101/api/auth/callback/github`
+
+---
+
+## Email Not Verified Error
+
+### Error Message
+
+```
+Email verification required
+```
+
+### Cause
+
+Better Auth is configured to require email verification, but user hasn't verified.
+
+### Solution
+
+**Option 1:** Resend verification email
+
+```typescript
+// Trigger verification email
+await auth.api.sendVerificationEmail({
+  email: user.email,
+});
+```
+
+**Option 2:** Manually verify (admin)
+
+```typescript
+await prisma.user.update({
+  where: { id: userId },
+  data: { emailVerified: true },
+});
+```
+
+**Option 3:** Disable verification requirement (development)
+
+```typescript
+// lib/auth.ts
+export const auth = betterAuth({
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false, // Disable in dev
+  },
+});
+```
+
+---
+
+## Password Change - No Password Set
+
+### Error Message
+
+```
+No password set for this account. You may have signed up with a social provider.
+```
+
+### Cause
+
+User registered via OAuth (Google, GitHub) and doesn't have a password in the Account table.
+
+### Solution
+
+For OAuth users who want to add a password:
+
+```typescript
+// Check if credential account exists
+const credentialAccount = await prisma.account.findFirst({
+  where: {
+    userId: user.id,
+    providerId: "credential",
+  },
+});
+
+if (!credentialAccount) {
+  // Create new credential account
+  const hashedPassword = await hashPassword(newPassword);
+  await prisma.account.create({
+    data: {
+      accountId: user.id,
+      providerId: "credential",
+      userId: user.id,
+      password: hashedPassword,
+    },
+  });
+} else {
+  // Update existing password
+  await prisma.account.update({
+    where: { id: credentialAccount.id },
+    data: { password: hashedPassword },
+  });
+}
+```
+
+---
+
+## Token Expired
+
+### Error Message
+
+```
+Token expired or invalid
+```
+
+### Cause
+
+Password reset or email verification token has expired.
+
+### Solution
+
+**Check token expiration settings:**
+
+```typescript
+// lib/auth.ts
+export const auth = betterAuth({
+  emailAndPassword: {
+    resetPasswordTokenExpiresIn: 3600, // 1 hour (in seconds)
+  },
+});
+```
+
+**Request new token:**
+
+```typescript
+// For password reset
+await auth.api.forgetPassword({
+  email: user.email,
+  redirectTo: "/reset-password",
+});
+
+// For email verification
+await auth.api.sendVerificationEmail({
+  email: user.email,
+});
+```

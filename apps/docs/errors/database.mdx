@@ -1,0 +1,272 @@
+---
+title: "Database Errors"
+description: "Common database and Prisma errors in TurboStack"
+---
+
+# Database Errors
+
+This page covers common database-related errors you may encounter when working with Prisma and PostgreSQL in TurboStack.
+
+## ColumnNotFound / P2022 Error
+
+### Error Message
+
+```
+PrismaClientKnownRequestError:
+Invalid `db[model].findFirst()` invocation
+The column `(not available)` does not exist in the current database.
+code: "P2022"
+```
+
+### Cause
+
+This error occurs when your Prisma schema has been updated with new fields (columns), but the database hasn't been synchronized yet. Better Auth or other services try to query columns that don't exist in the actual database.
+
+### Solution
+
+Run the database push command to sync your schema:
+
+```bash
+bun run db:push
+```
+
+Or if you prefer migrations:
+
+```bash
+bun run db:migrate
+```
+
+After syncing, restart your development server:
+
+```bash
+bun run dev
+```
+
+<Warning>
+  Always run `db:push` or `db:migrate` after modifying `schema.prisma` to keep
+  your database in sync.
+</Warning>
+
+---
+
+## Better Auth Database Query Error
+
+### Error Message
+
+```
+Better auth was unable to query your database.
+```
+
+### Cause
+
+This usually happens when:
+
+1. Database connection is not established
+2. Schema is out of sync (see ColumnNotFound error above)
+3. Missing required tables for Better Auth
+
+### Solution
+
+**Step 1:** Check your database connection:
+
+```bash
+# Ensure PostgreSQL is running
+docker-compose up -d postgres
+```
+
+**Step 2:** Verify your `.env` file has correct database URL:
+
+```env
+DATABASE_URL="postgresql://user:password@localhost:5434/turbostack"
+```
+
+**Step 3:** Sync the database schema:
+
+```bash
+bun run db:push
+```
+
+**Step 4:** Generate Prisma client:
+
+```bash
+bun run db:generate
+```
+
+---
+
+## Connection Refused Error
+
+### Error Message
+
+```
+Error: connect ECONNREFUSED 127.0.0.1:5434
+```
+
+### Cause
+
+PostgreSQL server is not running or not accessible on the specified port.
+
+### Solution
+
+**Using Docker:**
+
+```bash
+# Start PostgreSQL container
+docker-compose up -d postgres
+
+# Check if container is running
+docker ps
+```
+
+**Check port availability:**
+
+```bash
+# macOS/Linux
+lsof -i :5434
+
+# Windows
+netstat -an | findstr 5434
+```
+
+---
+
+## Migration Failed Error
+
+### Error Message
+
+```
+Error: P3009 migrate found failed migrations
+```
+
+### Cause
+
+A previous migration failed and left the database in an inconsistent state.
+
+### Solution
+
+**Option 1:** Reset migrations (Development only)
+
+```bash
+bun run db:push --force-reset
+```
+
+**Option 2:** Mark migration as rolled back
+
+```bash
+cd packages/database
+bunx prisma migrate resolve --rolled-back MIGRATION_NAME
+```
+
+**Option 3:** Fix and reapply
+
+```bash
+# Check migration status
+bunx prisma migrate status
+
+# Apply pending migrations
+bunx prisma migrate deploy
+```
+
+<Warning>
+  Never use `--force-reset` in production. It will delete all data.
+</Warning>
+
+---
+
+## Unique Constraint Violation
+
+### Error Message
+
+```
+PrismaClientKnownRequestError:
+Unique constraint failed on the fields: (`email`)
+code: "P2002"
+```
+
+### Cause
+
+Attempting to create a record with a value that already exists in a unique field.
+
+### Solution
+
+Check for existing records before creating:
+
+```typescript
+// Check if email exists
+const existingUser = await prisma.user.findUnique({
+  where: { email: data.email },
+});
+
+if (existingUser) {
+  throw new AppError("EMAIL_EXISTS", "A user with this email already exists", 400);
+}
+
+// Safe to create
+const user = await prisma.user.create({
+  data: { email: data.email, ... },
+});
+```
+
+---
+
+## Foreign Key Constraint Error
+
+### Error Message
+
+```
+PrismaClientKnownRequestError:
+Foreign key constraint failed on the field: `userId`
+code: "P2003"
+```
+
+### Cause
+
+Trying to create a record with a reference to a non-existent parent record.
+
+### Solution
+
+Ensure the referenced record exists:
+
+```typescript
+// Verify user exists before creating related record
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+});
+
+if (!user) {
+  throw new AppError("USER_NOT_FOUND", "User not found", 404);
+}
+
+// Now safe to create related record
+await prisma.account.create({
+  data: {
+    userId: user.id,
+    ...
+  },
+});
+```
+
+---
+
+## Prisma Client Not Generated
+
+### Error Message
+
+```
+Error: @prisma/client did not initialize yet
+```
+
+### Cause
+
+Prisma client hasn't been generated after schema changes.
+
+### Solution
+
+```bash
+bun run db:generate
+```
+
+<Tip>
+  Add `db:generate` to your `postinstall` script in `package.json` to
+  auto-generate on install.
+</Tip>

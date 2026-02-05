@@ -1,0 +1,264 @@
+---
+title: Project Structure
+description: Understanding the TurboStack monorepo structure and architecture
+---
+
+# Project Structure
+
+TurboStack is a high-performance, production-ready starter kit built with modern technologies. This guide explains the monorepo structure and architecture.
+
+## Overview
+
+TurboStack uses **Turborepo** for monorepo management with **Bun** as the package manager, enabling fast builds and efficient workspace management.
+
+## Directory Layout
+
+```
+turbostack/
+├── .cursor/                  # Cursor IDE configuration
+│   └── rules/                # Project rules and guidelines
+│       ├── project-rules.mdc # Main rules entry point
+│       └── turbostack/         # Modular rule files
+├── apps/
+│   ├── frontend/             # Next.js 16 frontend (port 4100)
+│   ├── backend/              # Elysia.js backend (port 4101)
+│   └── docs/                 # Documentation app (port 4102)
+├── packages/
+│   ├── database/             # Prisma schema and client
+│   ├── validations/          # Zod validation schemas
+│   ├── types/                # Shared TypeScript types
+│   ├── ui/                   # Shared UI components
+│   ├── eslint-config/        # ESLint configurations
+│   └── typescript-config/    # TypeScript configurations
+├── scripts/                  # Build and deployment scripts
+├── turbo.json                # Turborepo configuration
+├── package.json              # Root workspace configuration
+├── docker-compose.yml        # Docker orchestration
+└── .env.example              # Environment variables template
+```
+
+## Technology Stack
+
+| Category            | Technology          | Purpose                             |
+| ------------------- | ------------------- | ----------------------------------- |
+| **Monorepo**        | Turborepo           | Build orchestration and caching     |
+| **Package Manager** | Bun                 | Fast package management and runtime |
+| **Frontend**        | Next.js 16          | React framework with App Router     |
+| **Styling**         | Tailwind CSS v4     | Utility-first CSS framework         |
+| **UI Components**   | shadcn/ui           | Accessible, customizable components |
+| **Icons**           | Iconify (SSR)       | Server-side rendered icons          |
+| **Backend**         | Elysia.js           | High-performance API framework      |
+| **Database**        | Prisma + PostgreSQL | Type-safe ORM                       |
+| **Validation**      | Zod                 | Schema validation                   |
+| **Forms**           | React Hook Form     | Form state management               |
+| **Auth**            | JWT (jose) + Argon2 | Authentication                      |
+| **Email**           | Resend              | Transactional emails                |
+| **Payments**        | Polar.sh            | Payment processing                  |
+| **Documentation**   | Mintlify            | Beautiful documentation             |
+
+## Applications
+
+### apps/web - Next.js Frontend
+
+The main web application built with Next.js 16 and React 19.
+
+```
+apps/web/
+├── app/                      # Next.js App Router
+│   ├── (panel)/              # Panel route group
+│   ├── (auth)/               # Authentication pages
+│   ├── api/                  # API routes
+│   ├── components/           # Page-specific components
+│   ├── context/              # React contexts
+│   ├── docs/                 # Documentation pages
+│   ├── globals.css           # Global styles with Tailwind v4
+│   ├── layout.tsx            # Root layout
+│   └── page.tsx              # Home page
+├── components/               # Shared components
+│   ├── ui/                   # shadcn/ui components
+│   └── iconify.tsx           # SSR icon component
+├── lib/                      # Utilities
+│   ├── api.ts                # API client
+│   ├── auth-*.ts             # Authentication utilities
+│   └── utils.ts              # General utilities
+├── content/                  # MDX documentation content
+└── public/                   # Static assets
+```
+
+**Key Features:**
+
+- App Router with route groups for organization
+- Server Components by default
+- Tailwind CSS v4 with `@theme` configuration
+- shadcn/ui for accessible components
+- SSR icons with Iconify
+
+### apps/api - Elysia.js Backend
+
+High-performance API server running on Bun runtime.
+
+```
+apps/api/
+├── src/
+│   ├── index.ts              # Entry point with middleware
+│   ├── routes/               # Route handlers
+│   │   ├── auth.ts           # Authentication endpoints
+│   │   ├── users.ts          # User management
+│   │   ├── health.ts         # Health checks
+│   │   ├── polar.ts          # Payment routes
+│   │   └── webhooks.ts       # Webhook handlers
+│   ├── services/             # Business logic layer
+│   │   ├── auth.service.ts
+│   │   ├── email.service.tsx
+│   │   └── polar.service.ts
+│   └── emails/               # React Email templates
+└── Dockerfile                # Docker configuration
+```
+
+**Key Features:**
+
+- Elysia.js with type-safe routes
+- OpenAPI/Swagger documentation at `/openapi`
+- JWT authentication with refresh tokens
+- Rate limiting and CORS middleware
+- Service layer pattern for clean architecture
+
+## Packages
+
+### @repo/database
+
+Prisma ORM configuration and database client.
+
+```
+packages/database/
+├── prisma/
+│   ├── schema.prisma         # Database schema
+│   └── migrations/           # Migration history
+├── src/
+│   └── index.ts              # Prisma client export
+└── prisma.config.ts          # Prisma configuration
+```
+
+**Usage:**
+
+```typescript
+import { prisma, type User } from "@repo/database";
+
+const users = await prisma.user.findMany();
+```
+
+### @repo/validations
+
+Zod validation schemas shared between frontend and backend.
+
+```
+packages/validations/
+└── src/
+    ├── auth.ts               # Authentication schemas
+    ├── user.ts               # User-related schemas
+    └── index.ts              # Barrel export
+```
+
+**Usage:**
+
+```typescript
+import { loginSchema, type LoginInput } from "@repo/validations";
+
+const validated = loginSchema.parse(data);
+```
+
+### @repo/types
+
+Shared TypeScript type definitions.
+
+```
+packages/types/
+└── src/
+    └── index.ts              # Type definitions
+```
+
+### @repo/shadcn-ui
+
+Shared React components for use across applications.
+
+```
+packages/ui/
+└── src/
+    └── index.ts              # Component exports
+```
+
+## Configuration Files
+
+| File                 | Description                      |
+| -------------------- | -------------------------------- |
+| `turbo.json`         | Turborepo pipeline configuration |
+| `package.json`       | Root workspace configuration     |
+| `.env.example`       | Environment variables template   |
+| `docker-compose.yml` | Docker service orchestration     |
+| `render.yaml`        | Render deployment configuration  |
+
+## Quick Commands
+
+```bash
+# Development
+bun run dev              # Start all services
+bun run dev:web          # Start only web
+bun run dev:api          # Start only API
+
+# Database
+bun run db:generate      # Generate Prisma client
+bun run db:push          # Push schema to database
+bun run db:migrate       # Run migrations
+bun run db:studio        # Open Prisma Studio
+
+# Quality
+bun run lint             # Run linter
+bun run check-types      # TypeScript check
+bun run format           # Format code
+
+# Docker
+bun run docker:up        # Start containers
+bun run docker:down      # Stop containers
+bun run docker:logs      # View logs
+```
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/turbostack"
+
+# Authentication
+JWT_SECRET="your-secret-key-min-32-characters"
+
+# API
+NEXT_PUBLIC_API_URL="http://localhost:4101"
+CORS_ORIGIN="http://localhost:4100"
+
+# Email (Resend)
+RESEND_API_KEY="re_..."
+
+# Payments (Polar.sh)
+POLAR_ACCESS_TOKEN="polar_at_..."
+POLAR_WEBHOOK_SECRET="polar_ws_..."
+```
+
+## Project Rules
+
+TurboStack includes comprehensive project rules in `.cursor/rules/`:
+
+- **project-rules.mdc** - Main entry point
+- **turbostack/structure.mdc** - Project structure guidelines
+- **turbostack/technologies.mdc** - Technology documentation
+- **turbostack/api.mdc** - API development guidelines
+- **turbostack/frontend.mdc** - Frontend development guidelines
+- **turbostack/database.mdc** - Database and Prisma patterns
+- **turbostack/security.mdc** - Security best practices
+- **turbostack/clean-code.mdc** - Clean code principles
+
+<Info>
+  Each package in `packages/` can be imported using workspace protocol, e.g.,
+  `@repo/database`, `@repo/validations`.
+</Info>

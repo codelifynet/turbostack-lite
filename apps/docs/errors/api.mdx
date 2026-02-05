@@ -1,0 +1,423 @@
+---
+title: "API & Service Errors"
+description: "Common API, email, and file upload errors in TurboStack"
+---
+
+# API & Service Errors
+
+This page covers common API, email, and file upload errors in TurboStack.
+
+## Validation Errors
+
+### VALIDATION_ERROR with JSON Message
+
+**Error Message:**
+
+```json
+{
+  "success": false,
+  "error": "VALIDATION_ERROR",
+  "message": "{ \"type\": \"validation\", ... }"
+}
+```
+
+### Cause
+
+Elysia's validation errors return detailed JSON objects. The error handler needs to parse these into user-friendly messages.
+
+### Solution
+
+The global error handler in `apps/api/src/index.ts` should format validation errors:
+
+```typescript
+.onError(({ error, code, set }) => {
+  if (code === "VALIDATION") {
+    let message = "Validation failed";
+    try {
+      const errorObj = JSON.parse(error.message);
+
+      // Extract human-readable message
+      if (errorObj.all && Array.isArray(errorObj.all)) {
+        const firstError = errorObj.all[0];
+        message = firstError.summary || firstError.message;
+      } else if (errorObj.summary) {
+        message = errorObj.summary;
+      } else if (errorObj.message) {
+        message = errorObj.message;
+      }
+    } catch {
+      message = error.message;
+    }
+
+    set.status = 400;
+    return {
+      success: false,
+      error: "VALIDATION_ERROR",
+      message,
+    };
+  }
+});
+```
+
+### Frontend Handling
+
+```typescript
+const response = await userService.createUser(data);
+
+if (!response.success) {
+  // Display user-friendly message
+  toast.error(response.message || "Validation failed");
+}
+```
+
+---
+
+## Email Errors
+
+### Emails Not Sending
+
+**Symptoms:**
+
+- No emails received
+- No errors in console
+- API returns success
+
+### Cause
+
+1. `RESEND_API_KEY` not configured
+2. Email service calls using `void` instead of `await`
+3. Email sending silently failing
+
+### Solution
+
+**Step 1:** Check environment variable:
+
+```env
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+```
+
+**Step 2:** Ensure email calls are awaited:
+
+```typescript
+// Wrong - errors are silently swallowed
+void sendEmail({ ... });
+
+// Correct - errors are caught and logged
+try {
+  await sendEmail({ to, subject, html });
+  console.log("✅ Email sent successfully");
+} catch (error) {
+  console.error("❌ Failed to send email:", error);
+}
+```
+
+**Step 3:** Enable development mode logging:
+
+```typescript
+// In lib/resend.ts
+export const sendEmail = async ({ to, subject, html }) => {
+  if (!env.RESEND_API_KEY) {
+    // Log email content in development
+    console.log("📧 Development mode - Email would be sent:");
+    console.log({ to, subject, html: html.substring(0, 200) + "..." });
+    return { id: "dev-mode" };
+  }
+
+  return await resend.emails.send({
+    from: "noreply@yourdomain.com",
+    to,
+    subject,
+    html,
+  });
+};
+```
+
+### Resend Rate Limits
+
+**Error Message:**
+
+```
+Rate limit exceeded
+```
+
+**Solution:**
+
+- Free tier: 100 emails/day, 1 email/second
+- Check your Resend dashboard for usage
+- Implement email queuing for bulk sends
+
+---
+
+## File Upload Errors
+
+### UploadThing Token Missing
+
+**Error Message:**
+
+```
+UPLOADTHING_TOKEN is not defined
+```
+
+### Solution
+
+Add your UploadThing token to `.env`:
+
+```env
+UPLOADTHING_TOKEN=your_uploadthing_token_here
+```
+
+Get your token from [uploadthing.com](https://uploadthing.com).
+
+---
+
+### File Too Large
+
+**Error Message:**
+
+```
+FILE_TOO_LARGE: File size must be less than 4MB
+```
+
+### Cause
+
+Uploaded file exceeds the configured size limit.
+
+### Solution
+
+**Adjust limit in route:**
+
+```typescript
+// routes/profile.ts
+.post("/avatar", async ({ body }) => {
+  const maxSize = 4 * 1024 * 1024; // 4MB
+
+  if (body.avatar.size > maxSize) {
+    throw new AppError(
+      "FILE_TOO_LARGE",
+      "File size must be less than 4MB",
+      400
+    );
+  }
+});
+```
+
+**Frontend validation:**
+
+```typescript
+const handleFileSelect = (file: File) => {
+  const maxSize = 4 * 1024 * 1024; // 4MB
+
+  if (file.size > maxSize) {
+    toast.error("File size must be less than 4MB");
+    return;
+  }
+
+  uploadFile(file);
+};
+```
+
+---
+
+### Invalid File Type
+
+**Error Message:**
+
+```
+INVALID_FILE_TYPE: Only JPEG, PNG, GIF, and WebP images are allowed
+```
+
+### Solution
+
+**Backend validation:**
+
+```typescript
+const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+if (!allowedTypes.includes(file.type)) {
+  throw new AppError(
+    "INVALID_FILE_TYPE",
+    "Only JPEG, PNG, GIF, and WebP images are allowed",
+    400
+  );
+}
+```
+
+**Frontend validation:**
+
+```typescript
+<input
+  type="file"
+  accept="image/jpeg,image/png,image/gif,image/webp"
+  onChange={handleFileSelect}
+/>
+```
+
+---
+
+## CORS Errors
+
+### Error Message
+
+```
+Access to fetch at 'http://localhost:4101/api/...' from origin
+'http://localhost:4100' has been blocked by CORS policy
+```
+
+### Cause
+
+Backend CORS configuration doesn't allow requests from frontend origin.
+
+### Solution
+
+**Check CORS configuration:**
+
+```typescript
+// backend/src/index.ts
+import cors from "@elysiajs/cors";
+
+const app = new Elysia().use(
+  cors({
+    origin: env.CORS_ORIGIN, // Should be "http://localhost:4100"
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  })
+);
+```
+
+**Check `.env`:**
+
+```env
+CORS_ORIGIN=http://localhost:4100
+```
+
+---
+
+## Network Errors
+
+### Failed to Connect to Server
+
+**Error Message:**
+
+```
+Network Error: Failed to connect to server
+```
+
+### Cause
+
+1. Backend server is not running
+2. Wrong API URL configured
+3. Network connectivity issues
+
+### Solution
+
+**Check if backend is running:**
+
+```bash
+# Start development servers
+bun run dev
+
+# Or just backend
+bun run dev --filter=backend
+```
+
+**Check API URL in frontend:**
+
+```env
+# .env.local
+NEXT_PUBLIC_API_URL=http://localhost:4101
+```
+
+**Verify in code:**
+
+```typescript
+// lib/api.ts
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4101";
+```
+
+---
+
+## 404 Not Found Errors
+
+### API Route Not Found
+
+**Error Message:**
+
+```json
+{
+  "success": false,
+  "error": "NOT_FOUND",
+  "message": "NOT_FOUND"
+}
+```
+
+### Cause
+
+1. Route doesn't exist
+2. Wrong HTTP method
+3. Route prefix mismatch
+
+### Solution
+
+**Check route registration:**
+
+```typescript
+// backend/src/index.ts
+import { profileRoutes } from "./routes/profile";
+
+const app = new Elysia().use(profileRoutes); // Ensure route is registered
+```
+
+**Verify route prefix:**
+
+```typescript
+// routes/profile.ts
+export const profileRoutes = new Elysia({ prefix: "/profile" }).get(
+  "/",
+  handler
+); // Full path: /api/profile/
+```
+
+**Check API call:**
+
+```typescript
+// Correct
+await fetch("/api/profile/settings");
+
+// Wrong
+await fetch("/profile/settings"); // Missing /api prefix
+```
+
+---
+
+## Request Timeout
+
+### Error Message
+
+```
+Error: Request timeout after 30000ms
+```
+
+### Cause
+
+Long-running operation exceeds timeout limit.
+
+### Solution
+
+**Increase timeout for specific operations:**
+
+```typescript
+// Frontend
+const response = await fetch("/api/heavy-operation", {
+  signal: AbortSignal.timeout(60000), // 60 seconds
+});
+```
+
+**Backend optimization:**
+
+```typescript
+// Use streaming for large responses
+return new Response(stream, {
+  headers: { "Content-Type": "text/event-stream" },
+});
+```

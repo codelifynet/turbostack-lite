@@ -1,0 +1,130 @@
+---
+title: Forms
+description: Form handling with React Hook Form and Zod
+---
+
+# Form Handling
+
+TurboStack uses React Hook Form with Zod for type-safe form handling.
+
+## Setup
+
+The web app includes:
+
+- `react-hook-form` - Form state management
+- `@hookform/resolvers` - Validation resolvers
+- `zod` - Schema validation
+
+## Basic Form
+
+```tsx
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginInput } from "@repo/validations";
+
+export function LoginForm() {
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (data: LoginInput) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <div>
+        <label>Email</label>
+        <input {...form.register("email")} />
+        {form.formState.errors.email && (
+          <span>{form.formState.errors.email.message}</span>
+        )}
+      </div>
+
+      <div>
+        <label>Password</label>
+        <input type="password" {...form.register("password")} />
+        {form.formState.errors.password && (
+          <span>{form.formState.errors.password.message}</span>
+        )}
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+```
+
+## With shadcn/ui Form
+
+```tsx
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginInput } from "@repo/validations";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+export function LoginForm() {
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Login</Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+## Shared Validations
+
+Validation schemas are in `@repo/validations`:
+
+```typescript
+// packages/validations/src/auth.ts
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Minimum 6 characters"),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+```
+
+<Tip>
+  Using shared validations ensures frontend and backend have the same validation
+  rules.
+</Tip>

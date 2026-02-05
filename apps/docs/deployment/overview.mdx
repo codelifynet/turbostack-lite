@@ -1,0 +1,196 @@
+---
+title: Deployment Overview
+description: Deploy TurboStack to production
+---
+
+# Deployment Overview
+
+TurboStack supports multiple deployment strategies for different use cases.
+
+<Frame caption="Deployment Architecture">
+```mermaid
+graph TB
+    subgraph Production["☁️ Production Environment"]
+        subgraph Frontend["Frontend"]
+            V[Vercel / Netlify]
+        end
+
+        subgraph Backend["Backend"]
+            R[Railway / Render]
+            D[Docker Container]
+        end
+
+        subgraph Database["Database"]
+            P[(PostgreSQL)]
+            S[Supabase / Neon]
+        end
+    end
+
+    U[👤 Users] --> V
+    V --> R
+    V --> D
+    R --> P
+    D --> S
+
+````
+</Frame>
+
+---
+
+## Deployment Options
+
+<CardGroup cols={2}>
+  <Card title="Vercel + Railway" icon="bolt" href="/deployment/vercel">
+    **Recommended for most projects**
+    - Frontend on Vercel (free tier available)
+    - Backend on Railway ($5/mo)
+    - Database on Railway or Supabase
+  </Card>
+  <Card title="Docker Compose" icon="docker">
+    **Self-hosted solution**
+    - Full control over infrastructure
+    - Works on any VPS (DigitalOcean, Hetzner)
+    - All services in one server
+  </Card>
+  <Card title="Render" icon="server">
+    **Alternative PaaS**
+    - Simple deployment from Git
+    - Managed PostgreSQL included
+    - Good free tier
+  </Card>
+  <Card title="Fly.io" icon="plane">
+    **Edge deployment**
+    - Deploy close to users globally
+    - Built-in PostgreSQL
+    - Pay per use
+  </Card>
+</CardGroup>
+
+---
+
+## Comparison
+
+| Feature              | Vercel + Railway | Docker            | Render       |
+| -------------------- | ---------------- | ----------------- | ------------ |
+| **Setup Complexity** | ⭐ Easy          | ⭐⭐⭐ Advanced   | ⭐⭐ Medium  |
+| **Cost (Starting)**  | Free - $5/mo     | VPS cost (~$5/mo) | Free - $7/mo |
+| **Scaling**          | Automatic        | Manual            | Automatic    |
+| **Custom Domain**    | ✅ Yes           | ✅ Yes            | ✅ Yes       |
+| **SSL**              | ✅ Auto          | Manual/Caddy      | ✅ Auto      |
+| **Database**         | Railway/Supabase | Self-managed      | Managed      |
+
+---
+
+## Pre-Deployment Checklist
+
+<Steps>
+  <Step title="Environment Variables">
+    Ensure all required environment variables are set:
+
+    <AccordionGroup>
+      <Accordion title="Required Variables" icon="asterisk">
+        ```bash
+        # Database
+        DATABASE_URL=postgresql://...
+
+        # Security (CHANGE THESE!)
+        JWT_SECRET=your-production-secret-min-32-chars
+        SESSION_SECRET=another-production-secret
+
+        # URLs
+        FRONTEND_URL=https://yourdomain.com
+        NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+        CORS_ORIGIN=https://yourdomain.com
+
+        # Environment
+        NODE_ENV=production
+        ```
+      </Accordion>
+      <Accordion title="Optional Services" icon="plug">
+        ```bash
+        # Email (Resend)
+        RESEND_API_KEY=re_xxx
+        FROM_EMAIL=noreply@yourdomain.com
+
+        # Payments (Polar)
+        POLAR_ACCESS_TOKEN=polar_at_xxx
+        POLAR_WEBHOOK_SECRET=polar_ws_xxx
+
+        # API Docs Protection
+        DOCS_USERNAME=admin
+        DOCS_PASSWORD=your-secure-password
+        ```
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+
+  <Step title="Database Migration">
+    Run migrations on production database:
+
+    ```bash
+    DATABASE_URL=your-prod-url npx prisma migrate deploy
+    ```
+  </Step>
+
+  <Step title="Build Test">
+    Ensure the project builds successfully:
+
+    ```bash
+    bun run build
+    ```
+  </Step>
+
+  <Step title="Security Audit">
+    - ✅ Change all default secrets
+    - ✅ Enable HTTPS
+    - ✅ Configure CORS correctly
+    - ✅ Set up rate limiting
+    - ✅ Protect API documentation
+  </Step>
+</Steps>
+
+---
+
+## Quick Deploy
+
+### One-Click Vercel
+
+Deploy the frontend to Vercel instantly:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/codelifynet/turbostack-lite&project-name=turbostack&repository-name=turbostack&root-directory=apps/web&env=DATABASE_URL,JWT_SECRET,SESSION_SECRET,NEXT_PUBLIC_API_URL)
+
+### Docker Compose
+
+Deploy all services with Docker:
+
+```bash
+# Clone the repository
+git clone https://github.com/codelifynet/turbostack-lite.git
+cd turbostack
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your production values
+
+# Build and start
+docker compose -f docker-compose.prod.yml up -d
+````
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Vercel Deployment" icon="triangle" href="/deployment/vercel">
+    Step-by-step guide for Vercel + Railway deployment
+  </Card>
+  <Card title="Docker Guide" icon="docker" href="/deployment/docker">
+    Self-hosted deployment with Docker Compose
+  </Card>
+</CardGroup>
+
+<Warning>
+  **Never commit secrets to Git!** Always use environment variables for
+  sensitive data. Use `.env.local` for local development and platform-specific
+  secrets management for production.
+</Warning>

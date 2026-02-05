@@ -1,0 +1,78 @@
+---
+title: Webhooks
+description: Webhook configuration and event handling
+---
+
+# Webhooks
+
+TurboStack provides webhook endpoints for handling events from Polar.sh.
+
+## Configuration
+
+Add your webhook secret to `.env`:
+
+```env
+POLAR_WEBHOOK_SECRET=polar_ws_xxxxx
+```
+
+Configure the webhook URL in [Polar Dashboard](https://polar.sh/settings/webhooks):
+
+```
+https://your-api-domain.com/webhooks/polar
+```
+
+## Handled Events
+
+| Event                      | Handler                               |
+| -------------------------- | ------------------------------------- |
+| `order.created`            | Creates order record                  |
+| `order.paid`               | Provisions access, sends confirmation |
+| `order.refunded`           | Revokes access                        |
+| `subscription.created`     | Creates subscription record           |
+| `subscription.updated`     | Updates subscription status           |
+| `subscription.canceled`    | Revokes premium access                |
+| `checkout.created`         | Logs checkout start                   |
+| `product.created/updated`  | Syncs product data                    |
+| `customer.created/updated` | Syncs customer data                   |
+
+## Customizing Handlers
+
+Edit `apps/api/src/services/polar.service.ts` to add your business logic:
+
+```typescript
+function handleOrderPaid(data: unknown): WebhookResult {
+  const order = data as { id: string; customerId?: string };
+
+  // Add your logic here:
+  // - Grant access to purchased content
+  // - Send confirmation email
+  // - Update database records
+
+  return {
+    success: true,
+    message: "Order paid",
+    eventType: "order.paid",
+    data: { orderId: order.id },
+  };
+}
+```
+
+## Testing Webhooks
+
+### Local Development
+
+Use a tool like [ngrok](https://ngrok.com) to expose your local server:
+
+```bash
+ngrok http 4101
+```
+
+Then use the ngrok URL in Polar dashboard.
+
+### Send Test Events
+
+Polar dashboard allows sending test webhook events to verify your integration.
+
+## Security
+
+Webhooks are verified using HMAC signatures. The `validateWebhookEvent` function automatically verifies the signature before processing any event.

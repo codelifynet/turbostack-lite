@@ -1,0 +1,470 @@
+---
+title: Development Workflow
+description: Complete guide to developing with TurboStack
+---
+
+# Development Workflow
+
+This guide covers everything you need to know for daily development with TurboStack.
+
+---
+
+## Development Commands
+
+### Starting Applications
+
+<Tabs>
+  <Tab title="All Services" icon="play">
+    ```bash
+    # Start all applications (parallel with Turborepo)
+    bun run dev
+    ```
+    Starts frontend (4100), backend (4101), and docs (4102)
+  </Tab>
+  <Tab title="Individual" icon="server">
+    ```bash
+    # Start only frontend
+    bun run dev:web
+
+    # Start only backend
+    bun run dev:api
+
+    # Start only documentation
+    bun run dev:docs
+    ```
+
+  </Tab>
+</Tabs>
+
+### Port Information
+
+| Application      | Port | URL                                                     |
+| ---------------- | ---- | ------------------------------------------------------- |
+| 🖥️ **Frontend**  | 4100 | [localhost:4100](http://localhost:4100)                 |
+| ⚡ **Backend**   | 4101 | [localhost:4101](http://localhost:4101)                 |
+| 📚 **API Docs**  | 4101 | [localhost:4101/openapi](http://localhost:4101/openapi) |
+| 📖 **Docs Site** | 4102 | [localhost:4102](http://localhost:4102)                 |
+
+---
+
+## Database Commands
+
+<CardGroup cols={2}>
+  <Card title="Generate Client" icon="code">
+    ```bash bun run db:generate ``` Regenerate Prisma client after schema
+    changes
+  </Card>
+  <Card title="Push Schema" icon="upload">
+    ```bash bun run db:push ``` Apply schema to database (dev only)
+  </Card>
+  <Card title="Create Migration" icon="timeline">
+    ```bash bun run db:migrate ``` Create and apply migration files
+  </Card>
+  <Card title="Prisma Studio" icon="window">
+    ```bash bun run db:studio ``` Visual database browser at localhost:5555
+  </Card>
+</CardGroup>
+
+---
+
+## Development Workflow
+
+### 1. Adding a New API Route
+
+<Steps>
+  <Step title="Create Route File">
+    Create a new route file in `apps/api/src/routes/`:
+
+    ```typescript
+    // apps/api/src/routes/products.ts
+    import { Elysia, t } from "elysia";
+    import { db } from "@repo/database";
+
+    export const productRoutes = new Elysia({ prefix: "/products" })
+      .get("/", async () => {
+        const products = await db.product.findMany();
+        return { success: true, data: products };
+      })
+      .post(
+        "/",
+        async ({ body }) => {
+          const product = await db.product.create({
+            data: body,
+          });
+          return { success: true, data: product };
+        },
+        {
+          body: t.Object({
+            name: t.String(),
+            price: t.Number(),
+          }),
+        }
+      );
+    ```
+
+  </Step>
+
+  <Step title="Register Route">
+    Add to `apps/api/src/index.ts`:
+
+    ```typescript
+    import { productRoutes } from "./routes/products";
+
+    app.use(productRoutes);
+    ```
+
+  </Step>
+
+  <Step title="Test with Swagger">
+    Visit [localhost:4101/openapi](http://localhost:4101/openapi) to test your new endpoints.
+  </Step>
+</Steps>
+
+### 2. Adding a UI Component
+
+<Steps>
+  <Step title="Create Component">
+    Add component to `packages/ui/src/`:
+
+    ```tsx
+    // packages/ui/src/input.tsx
+    import * as React from "react";
+
+    export interface InputProps
+      extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+    export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+      ({ className, ...props }, ref) => {
+        return <input ref={ref} className={className} {...props} />;
+      }
+    );
+    Input.displayName = "Input";
+    ```
+
+  </Step>
+
+  <Step title="Export Component">
+    Add to `packages/ui/src/index.ts`:
+
+    ```typescript
+    export { Input, type InputProps } from "./input";
+    ```
+
+  </Step>
+
+  <Step title="Use in Frontend">
+    ```tsx
+    // apps/web/app/page.tsx
+    import { Input } from "@repo/shadcn-ui";
+
+    export default function Page() {
+      return <Input placeholder="Enter text..." />;
+    }
+    ```
+
+  </Step>
+</Steps>
+
+### 3. Database Schema Update
+
+<Steps>
+  <Step title="Update Schema">
+    Edit `packages/database/prisma/schema.prisma`:
+
+    ```prisma
+    model Post {
+      id        String   @id @default(cuid())
+      title     String
+      content   String?
+      authorId  String
+      author    User     @relation(fields: [authorId], references: [id])
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
+
+      @@map("posts")
+    }
+
+    model User {
+      id    String @id @default(cuid())
+      // ... existing fields
+      posts Post[]
+    }
+    ```
+
+  </Step>
+
+<Step title="Create Migration">
+  ```bash bun run db:migrate ``` Enter a descriptive migration name when
+  prompted.
+</Step>
+
+  <Step title="Generate Client">
+    ```bash
+    bun run db:generate
+    ```
+    Regenerate Prisma client with new types.
+  </Step>
+</Steps>
+
+---
+
+## Turborepo Filtering
+
+Run commands for specific packages:
+
+<CodeGroup>
+```bash Build Specific Package
+# Build only UI package
+bun run build --filter=@repo/shadcn-ui
+
+# Build frontend and its dependencies
+
+bun run build --filter=frontend...
+
+# Build package and its dependents
+
+bun run build --filter=...@repo/database
+
+````
+
+```bash Dev Mode Filtering
+# Start only frontend and its deps
+bun run dev --filter=frontend...
+````
+
+</CodeGroup>
+
+---
+
+## Code Quality
+
+<CardGroup cols={2}>
+  <Card title="Linting" icon="broom">
+    ```bash
+    # Run ESLint
+    bun run lint
+
+    # Auto-fix issues
+    bun run lint:fix
+    ```
+
+  </Card>
+  <Card title="Type Check" icon="check-double">
+    ```bash
+    # TypeScript check
+    bun run check-types
+    ```
+  </Card>
+  <Card title="Format" icon="sparkles">
+    ```bash
+    # Format with Prettier
+    bun run format
+    ```
+  </Card>
+  <Card title="Build" icon="hammer">
+    ```bash
+    # Build all apps
+    bun run build
+    ```
+  </Card>
+</CardGroup>
+
+---
+
+## Debugging
+
+### Backend Debugging
+
+<Tabs>
+  <Tab title="Console Logs" icon="terminal">
+    Use `console.log()` or `console.error()`:
+
+    ```typescript
+    console.log("User data:", user);
+    console.error("Error:", error);
+    ```
+
+  </Tab>
+  <Tab title="VS Code Debugger" icon="bug">
+    Add to `.vscode/launch.json`:
+
+    ```json
+    {
+      "version": "0.2.0",
+      "configurations": [
+        {
+          "name": "Debug Backend",
+          "type": "bun",
+          "request": "launch",
+          "program": "${workspaceFolder}/apps/api/src/index.ts",
+          "cwd": "${workspaceFolder}/apps/api"
+        }
+      ]
+    }
+    ```
+
+  </Tab>
+</Tabs>
+
+### Frontend Debugging
+
+<Tabs>
+  <Tab title="React DevTools" icon="react">
+    Install [React DevTools](https://react.dev/learn/react-developer-tools) browser extension.
+  </Tab>
+  <Tab title="Console" icon="terminal">
+    ```typescript
+    console.log("Component rendered:", { props, state });
+    ```
+  </Tab>
+  <Tab title="Network Tab" icon="network-wired">
+    Monitor API calls in browser DevTools → Network tab
+  </Tab>
+</Tabs>
+
+---
+
+## Docker Development
+
+<Tabs>
+  <Tab title="Start Services" icon="docker">
+    ```bash
+    # Start all containers
+    docker-compose up -d
+
+    # View logs
+    docker-compose logs -f
+
+    # Stop containers
+    docker-compose down
+    ```
+
+  </Tab>
+  <Tab title="Database Only" icon="database">
+    ```bash
+    docker run --name turbostack-db \
+      -e POSTGRES_USER=turbostack \
+      -e POSTGRES_PASSWORD=turbostack \
+      -e POSTGRES_DB=turbostack \
+      -p 5432:5432 \
+      -d postgres:16-alpine
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Environment Variables
+
+### Development Setup
+
+Create `.env` in project root:
+
+```bash
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/turbostack"
+
+# Security
+JWT_SECRET="your-super-secret-jwt-key-min-32-characters"
+SESSION_SECRET="another-super-secret-session-key"
+
+# URLs
+FRONTEND_URL="http://localhost:4100"
+NEXT_PUBLIC_API_URL="http://localhost:4101"
+
+# Optional Services
+RESEND_API_KEY="re_..."
+POLAR_ACCESS_TOKEN="polar_at_..."
+```
+
+<Warning>
+  Never commit `.env` files to version control. Always use `.env.example` as a
+  template.
+</Warning>
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port already in use" icon="exclamation-triangle">
+    ```bash
+    # Find process using port
+    lsof -i :4100
+
+    # Kill the process
+    kill -9 <PID>
+    ```
+
+  </Accordion>
+
+  <Accordion title="Prisma Client errors" icon="database">
+    ```bash
+    # Regenerate Prisma Client
+    bun run db:generate
+
+    # Clear node_modules and reinstall
+    rm -rf node_modules bun.lockb
+    bun install
+    ```
+
+  </Accordion>
+
+<Accordion title="Type errors after schema change" icon="code">
+  1. Regenerate Prisma Client: `bun run db:generate` 2. Restart TypeScript
+  server in VS Code 3. Clear Next.js cache: `rm -rf apps/web/.next`
+</Accordion>
+
+  <Accordion title="Turborepo cache issues" icon="rotate">
+    ```bash
+    # Clear Turborepo cache
+    bun run turbo clean
+
+    # Force rebuild
+    bun run build --force
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Git Workflow" icon="git">
+    - Create feature branches - Write meaningful commit messages - Keep commits
+    atomic - Review changes before committing
+  </Card>
+  <Card title="Code Style" icon="palette">
+    - Follow ESLint rules - Use Prettier for formatting - Write JSDoc comments -
+    Keep functions small
+  </Card>
+  <Card title="Testing" icon="vial">
+    - Write tests for business logic - Test API endpoints - Use MSW for API
+    mocking - Maintain high coverage
+  </Card>
+  <Card title="Performance" icon="gauge-high">
+    - Use Server Components - Minimize client bundles - Optimize images -
+    Monitor bundle size
+  </Card>
+</CardGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Development" icon="cloud" href="/backend/elysia">
+    Learn backend development patterns
+  </Card>
+  <Card title="Frontend Guide" icon="browser" href="/frontend/nextjs">
+    Master Next.js and React patterns
+  </Card>
+  <Card title="Database" icon="database" href="/database/prisma">
+    Work with Prisma and PostgreSQL
+  </Card>
+  <Card title="Deployment" icon="rocket" href="/deployment/overview">
+    Deploy to production
+  </Card>
+</CardGroup>

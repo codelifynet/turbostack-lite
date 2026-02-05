@@ -1,0 +1,290 @@
+---
+title: shadcn/ui
+description: Beautiful, accessible React components
+---
+
+# shadcn/ui Components
+
+TurboStack uses **shadcn/ui** - a collection of beautifully designed, accessible React components.
+
+<CardGroup cols={3}>
+  <Card title="Accessible" icon="universal-access">
+    Built with Radix UI primitives
+  </Card>
+  <Card title="Customizable" icon="paintbrush">
+    Style with CSS variables
+  </Card>
+  <Card title="Copy & Paste" icon="copy">
+    Own your components
+  </Card>
+</CardGroup>
+
+---
+
+## Included Components
+
+TurboStack comes with these pre-installed components:
+
+<Tabs>
+  <Tab title="Forms" icon="input-text">
+    - `Button` - Clickable buttons with variants - `Input` - Text input fields -
+    `Textarea` - Multi-line text input - `Select` - Dropdown selection -
+    `Checkbox` - Boolean checkbox - `Switch` - Toggle switch - `Label` - Form
+    labels - `Form` - Form wrapper with validation
+  </Tab>
+  <Tab title="Layout" icon="table-columns">
+    - `Card` - Content containers - `Dialog` - Modal dialogs - `Sheet` -
+    Slide-out panels - `Tabs` - Tabbed content - `Accordion` - Collapsible
+    sections - `Separator` - Visual dividers - `ScrollArea` - Custom scrollbars
+  </Tab>
+  <Tab title="Navigation" icon="compass">
+    - `DropdownMenu` - Dropdown menus - `NavigationMenu` - Site navigation -
+    `Breadcrumb` - Breadcrumb trails - `Pagination` - Page navigation -
+    `Command` - Command palette
+  </Tab>
+  <Tab title="Feedback" icon="bell">
+    - `Alert` - Alert messages - `AlertDialog` - Confirmation dialogs - `Toast`
+    - Toast notifications - `Tooltip` - Hover tooltips - `Badge` - Status badges
+    - `Progress` - Progress bars - `Skeleton` - Loading placeholders
+  </Tab>
+</Tabs>
+
+---
+
+## Usage Examples
+
+<AccordionGroup>
+  <Accordion title="Button Variants" icon="square" defaultOpen>
+    ```tsx
+    import { Button } from "@/components/ui/button";
+
+    export function ButtonDemo() {
+      return (
+        <div className="flex gap-4">
+          <Button>Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="destructive">Destructive</Button>
+          <Button variant="link">Link</Button>
+        </div>
+      );
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion title="Form with Validation" icon="clipboard-check">
+    ```tsx
+    import { useForm } from "react-hook-form";
+    import { zodResolver } from "@hookform/resolvers/zod";
+    import { z } from "zod";
+    import { Button } from "@/components/ui/button";
+    import { Input } from "@/components/ui/input";
+    import {
+      Form,
+      FormControl,
+      FormField,
+      FormItem,
+      FormLabel,
+      FormMessage,
+    } from "@/components/ui/form";
+
+    const schema = z.object({
+      email: z.string().email(),
+      password: z.string().min(6),
+    });
+
+    export function LoginForm() {
+      const form = useForm({
+        resolver: zodResolver(schema),
+      });
+
+      return (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="you@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Login</Button>
+          </form>
+        </Form>
+      );
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion title="Toast Notifications" icon="bell">
+    ```tsx
+    import { toast } from "sonner";
+    import { Button } from "@/components/ui/button";
+
+    export function ToastDemo() {
+      return (
+        <div className="flex gap-4">
+          <Button onClick={() => toast.success("Success!")}>
+            Success
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => toast.error("Error occurred")}
+          >
+            Error
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.loading("Loading...")}
+          >
+            Loading
+          </Button>
+        </div>
+      );
+    }
+    ```
+
+  </Accordion>
+
+  <Accordion title="Dialog/Modal" icon="window-maximize">
+    ```tsx
+    import {
+      Dialog,
+      DialogContent,
+      DialogDescription,
+      DialogHeader,
+      DialogTitle,
+      DialogTrigger,
+    } from "@/components/ui/dialog";
+    import { Button } from "@/components/ui/button";
+
+    export function DialogDemo() {
+      return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>Open Dialog</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Are you sure?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            {/* Dialog content here */}
+          </DialogContent>
+        </Dialog>
+      );
+    }
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Adding New Components
+
+<Steps>
+  <Step title="Browse Available Components">
+    Visit [ui.shadcn.com](https://ui.shadcn.com/docs/components) to see all available components.
+  </Step>
+
+  <Step title="Install Component">
+    ```bash
+    cd apps/web
+    npx shadcn@latest add [component-name]
+
+    # Examples:
+    npx shadcn@latest add calendar
+    npx shadcn@latest add data-table
+    npx shadcn@latest add chart
+    ```
+
+  </Step>
+
+  <Step title="Import and Use">
+    ```tsx
+    import { Calendar } from "@/components/ui/calendar";
+
+    export function DatePicker() {
+      const [date, setDate] = useState<Date>();
+
+      return (
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+        />
+      );
+    }
+    ```
+
+  </Step>
+</Steps>
+
+---
+
+## Theming
+
+### CSS Variables
+
+Customize the theme in `globals.css`:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --accent: 240 4.8% 95.9%;
+    --destructive: 0 84.2% 60.2%;
+    --ring: 240 5% 64.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+}
+```
+
+### Dark Mode
+
+TurboStack uses `next-themes` for dark mode:
+
+```tsx
+import { useTheme } from "next-themes";
+
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      {theme === "dark" ? "🌙" : "☀️"}
+    </Button>
+  );
+}
+```
+
+<Tip>
+  All shadcn/ui components automatically support dark mode when you toggle the
+  theme.
+</Tip>

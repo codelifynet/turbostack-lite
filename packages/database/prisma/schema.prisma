@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// Enums
+// ============================================
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+// ============================================
+// Better-Auth Required Models
+// ============================================
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  image           String?
+  role            UserRole  @default(USER)
+  bio             String?
+  skills          String[]  @default([])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+	// Relations
+	sessions            Session[]
+	accounts            Account[]
+	settings            UserSettings?
+	notificationSettings NotificationSettings?
+
+	@@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+// ============================================
+// User Settings Model
+// ============================================
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Theme colors (OKLCH format)
+  primaryColor        String? // e.g., "oklch(0.55 0.25 280)"
+  primaryForeground   String? // e.g., "oklch(0.99 0 0)"
+  secondaryColor      String? // e.g., "oklch(0.97 0 0)"
+  secondaryForeground String? // e.g., "oklch(0.205 0 0)"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_settings")
+}
+
+// ============================================
+// Media Upload Settings (Global)
+// ============================================
+
+model MediaUploadSettings {
+  id        String   @id @default(cuid())
+  isGlobal  Boolean  @unique @default(true)
+  maxFileSize   Int      @default(4)
+  maxFileCount  Int      @default(10)
+  allowedMimeTypes String[] @default(["image/jpeg", "image/png", "image/gif", "image/webp"])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("media_upload_settings")
+}
+
+// ============================================
+// Notification Settings Model
+// ============================================
+
+model NotificationSettings {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  emailAccountActivity Boolean @default(true)
+  emailSecurityAlerts  Boolean @default(true)
+  emailMarketing       Boolean @default(false)
+  emailWeeklyDigest    Boolean @default(true)
+  pushBrowser          Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_settings")
+}
+
+
+

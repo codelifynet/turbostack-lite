@@ -1,0 +1,103 @@
+---
+title: Migrations
+description: Database migrations with Prisma
+---
+
+# Database Migrations
+
+Manage database schema changes with Prisma migrations.
+
+## Development Workflow
+
+### Quick Sync (db push)
+
+For rapid development, use `db:push` to sync schema without migrations:
+
+```bash
+bun run db:push
+```
+
+<Warning>
+  `db:push` is for development only. It may cause data loss. Use migrations for
+  production.
+</Warning>
+
+### Create Migration
+
+Create a migration file for production:
+
+```bash
+bun run db:migrate
+```
+
+This will:
+
+1. Generate SQL migration files
+2. Apply pending migrations
+3. Regenerate Prisma Client
+
+## Migration Files
+
+Migrations are stored in `packages/database/prisma/migrations/`:
+
+```
+prisma/migrations/
+├── 20240101000000_init/
+│   └── migration.sql
+├── 20240115000000_add_posts/
+│   └── migration.sql
+└── migration_lock.toml
+```
+
+## Common Workflows
+
+### Adding a New Field
+
+1. Update `schema.prisma`:
+
+```prisma
+model User {
+  // ... existing fields
+  bio String?  // New field
+}
+```
+
+2. Create migration:
+
+```bash
+bun run db:migrate
+```
+
+3. Name your migration: `add_user_bio`
+
+### Renaming a Field
+
+1. Update schema
+2. Create migration with `--create-only`:
+
+```bash
+cd packages/database
+npx prisma migrate dev --create-only
+```
+
+3. Edit the migration SQL to use `RENAME COLUMN`
+4. Apply: `npx prisma migrate dev`
+
+### Reset Database
+
+Reset development database (deletes all data):
+
+```bash
+cd packages/database
+npx prisma migrate reset
+```
+
+## Production Deployment
+
+Deploy migrations in production:
+
+```bash
+npx prisma migrate deploy
+```
+
+<Note>Always backup your production database before running migrations.</Note>

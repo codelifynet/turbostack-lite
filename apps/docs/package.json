@@ -1,0 +1,10 @@
+{
+	"name": "docs",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "npx mintlify@latest dev --port 4102 --no-open",
+		"build": "echo 'Mintlify build skipped (docs are synced via Git)'",
+		"clean": "echo 'No clean needed for docs'"
+	}
+}

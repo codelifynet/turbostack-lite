@@ -1,0 +1,276 @@
+---
+title: "Media Service"
+description: "Unified media upload and management with UploadThing"
+---
+
+## Overview
+
+TurboStack provides a **unified media service** using **UploadThing** for file uploads and media management.
+
+<Note>
+  **Important:** When adding or modifying media endpoints, always update the
+  OpenAPI/Swagger documentation! This ensures the API documentation stays in
+  sync with your code.
+</Note>
+
+## Provider Architecture
+
+The media service uses an abstraction layer that allows you to swap providers without changing your application code:
+
+```
+┌──────────────────────────────────────┐
+│      MediaService (Facade)           │
+├──────────────────────────────────────┤
+│      UploadThingProvider             │
+└──────────────────────────────────────┘
+```
+
+## API Endpoints
+
+<CardGroup cols={2}>
+  <Card title="POST /api/media/upload" icon="upload">
+    Upload a file using the active provider
+  </Card>
+  <Card title="GET /api/media/:id" icon="image">
+    Get media file details
+  </Card>
+  <Card title="DELETE /api/media/:id" icon="trash">
+    Delete a media file
+  </Card>
+  <Card title="POST /api/media/transform" icon="wand-magic-sparkles">
+    Apply transformations to media
+  </Card>
+</CardGroup>
+
+## Configuration
+
+<Steps>
+  <Step title="Environment Variables">
+    Add provider credentials to `.env`:
+    
+    ```env
+    
+    # UploadThing
+    UPLOADTHING_TOKEN=your_token_here
+    ```
+  </Step>
+  
+  <Step title="Provider Setup">
+    Configure the media service in `lib/media/media.service.ts`:
+    
+    ```typescript
+    import { MediaService } from "@/lib/media/media.service";
+    import { UploadThingProvider } from "@/lib/media/providers/uploadthing";
+
+    export const mediaService = new MediaService(new UploadThingProvider());
+    ```
+
+  </Step>
+</Steps>
+
+## Usage Examples
+
+### Upload a File
+
+```typescript
+// POST /api/media/upload
+const response = await fetch("http://localhost:4101/api/media/upload", {
+  method: "POST",
+  body: formData,
+});
+
+const result = await response.json();
+// {
+//   success: true,
+//   data: {
+//     id: "file_123",
+//     url: "https://...",
+//     name: "image.jpg",
+//     size: 245632,
+//     type: "image/jpeg"
+//   }
+// }
+```
+
+### Apply Transformations
+
+```typescript
+// POST /api/media/transform
+const response = await fetch("http://localhost:4101/api/media/transform", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    fileId: "file_123",
+    transformations: {
+      width: 800,
+      height: 600,
+      format: "webp",
+      quality: 80,
+    },
+  }),
+});
+```
+
+### Delete a File
+
+```typescript
+// DELETE /api/media/:id
+await fetch("http://localhost:4101/api/media/file_123", {
+  method: "DELETE",
+});
+```
+
+## Frontend Integration
+
+### Using UploadThing (React)
+
+```tsx
+import { UploadButton } from "@uploadthing/react";
+import type { OurFileRouter } from "../api/lib/uploadthing";
+
+export function ImageUploader() {
+  return (
+    <UploadButton<OurFileRouter, "imageUploader">
+      endpoint="imageUploader"
+      onClientUploadComplete={(res) => {
+        console.log("Upload completed:", res);
+      }}
+      onUploadError={(error) => {
+        console.error("Upload error:", error);
+      }}
+    />
+  );
+}
+```
+
+### Custom Upload Component
+
+```tsx
+export function MediaUploader() {
+  const handleUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/media/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    return result.data;
+  };
+
+  return (
+    <input
+      type="file"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) handleUpload(file);
+      }}
+    />
+  );
+}
+```
+
+## OpenAPI Documentation
+
+<Warning>
+  **Remember:** Every media endpoint change MUST be documented in Swagger!
+</Warning>
+
+### Example: Documented Upload Endpoint
+
+```typescript
+// src/routes/upload.ts
+export const mediaRoutes = new Elysia({ prefix: "/media" }).post(
+  "/upload",
+  async ({ body }) => {
+    const result = await mediaService.upload(body.file);
+    return { success: true, data: result };
+  },
+  {
+    body: t.Object({
+      file: t.File(),
+    }),
+    detail: {
+      tags: ["Media"],
+      summary: "Upload a file",
+      description: "Upload a file using the active media provider",
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            schema: {
+              type: "object",
+              properties: {
+                file: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "File uploaded successfully",
+          content: {
+            "application/json": {
+              example: {
+                success: true,
+                data: {
+                  id: "file_123",
+                  url: "https://example.com/file.jpg",
+                  name: "file.jpg",
+                  size: 245632,
+                  type: "image/jpeg",
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: "Invalid file or upload failed",
+        },
+      },
+    },
+  }
+);
+```
+
+## Provider
+
+### UploadThing
+
+- Type-safe file upload solution
+- Built-in React components
+- Automatic CDN delivery
+- Max file size: 4MB (configurable)
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Always update Swagger docs">
+    When you create or modify a media endpoint, add comprehensive OpenAPI
+    documentation with: - Tags (use "Media") - Summary and description -
+    Request/response examples - Error responses (400, 404, 500)
+  </Accordion>
+
+<Accordion title="Validate file types">
+  Always validate file types and sizes on the backend before uploading.
+</Accordion>
+
+<Accordion title="Use transformations">
+  Apply transformations to optimize images for web delivery (resize, compress,
+  format conversion).
+</Accordion>
+
+  <Accordion title="Handle errors gracefully">
+    Provide clear error messages when uploads fail or files are not found.
+  </Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Media Service Architecture](./.ai/rules/media.md) - Detailed provider pattern implementation
+- [Backend Guidelines](./.ai/rules/backend.md) - Backend development patterns

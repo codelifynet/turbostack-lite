@@ -1,0 +1,96 @@
+---
+title: Prisma
+description: Database management with Prisma ORM
+---
+
+# Prisma ORM
+
+TurboStack uses Prisma as the database ORM with a shared package.
+
+## Package Location
+
+The database package is at `packages/database/`:
+
+```
+packages/database/
+├── prisma/
+│   └── schema.prisma   # Database schema
+├── src/
+│   └── index.ts        # Prisma client export
+└── package.json
+```
+
+## Configuration
+
+Database connection is configured via environment variable:
+
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/turbostack"
+```
+
+## Commands
+
+```bash
+# Push schema to database (development)
+bun run db:push
+
+# Generate Prisma client
+bun run db:generate
+
+# Create migration
+bun run db:migrate
+
+# Open Prisma Studio
+bun run db:studio
+```
+
+## Using the Client
+
+Import from the shared package:
+
+```typescript
+import { prisma } from "@repo/database";
+
+// Create a user
+const user = await prisma.user.create({
+  data: {
+    email: "user@example.com",
+    name: "John Doe",
+  },
+});
+
+// Find users
+const users = await prisma.user.findMany();
+
+// Update user
+await prisma.user.update({
+  where: { id: "user_123" },
+  data: { name: "Jane Doe" },
+});
+
+// Delete user
+await prisma.user.delete({
+  where: { id: "user_123" },
+});
+```
+
+## Re-exported Types
+
+The package re-exports all Prisma types:
+
+```typescript
+import { prisma, User, Role, Prisma } from "@repo/database";
+
+// Use types
+const user: User = await prisma.user.findFirst();
+
+// Use enums
+const admins = await prisma.user.findMany({
+  where: { role: Role.ADMIN },
+});
+```
+
+<Tip>
+  Prisma Studio provides a visual interface to view and edit your database at
+  [localhost:5555](http://localhost:5555).
+</Tip>

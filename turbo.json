@@ -1,0 +1,44 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "ui": "tui",
+  "globalEnv": ["NODE_ENV"],
+
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": ["NEXT_PUBLIC_API_URL", "DATABASE_URL", "NEXTAUTH_URL"]
+    },
+
+    "web#build": {
+      "env": ["NEXT_PRIVATE_SKIP_PATCHING"]
+    },
+
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+
+    "check-types": {
+      "dependsOn": ["^check-types"],
+      "outputs": []
+    },
+
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+
+    "db:generate": { "cache": false },
+    "db:push": { "cache": false },
+    "db:migrate": { "cache": false },
+    "db:studio": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:reset": { "cache": false },
+    "db:seed": { "cache": false },
+
+    "clean": { "cache": false }
+  }
+}

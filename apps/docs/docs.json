@@ -1,0 +1,102 @@
+{
+	"$schema": "https://mintlify.com/docs.json",
+	"theme": "maple",
+	"name": "TurboStack",
+	"description": "Modern fullstack monorepo starter built with Next.js 16, Elysia.js, and Prisma",
+	"colors": {
+		"primary": "#6366f1",
+		"light": "#F8FAFC",
+		"dark": "#0F172A"
+	},
+	"search": {
+		"prompt": "Search documentation..."
+	},
+	"navigation": {
+		"tabs": [
+			{
+				"tab": "Documentation",
+				"groups": [
+					{
+						"group": "Getting Started",
+						"icon": "rocket",
+						"pages": [
+							"introduction",
+							"quickstart",
+							"project-structure",
+							"development",
+							"ai-rules"
+						]
+					},
+					{
+						"group": "Backend",
+						"icon": "cloud",
+						"pages": [
+							"backend/elysia",
+							"backend/routes",
+							"backend/authentication",
+							"backend/email",
+							"backend/polar",
+							"backend/webhooks",
+							"backend/media"
+						]
+					},
+					{
+						"group": "Database",
+						"icon": "database",
+						"pages": [
+							"database/prisma",
+							"database/schema",
+							"database/migrations"
+						]
+					},
+					{
+						"group": "Frontend",
+						"icon": "window",
+						"pages": [
+							"frontend/nextjs",
+							"frontend/shadcn-ui",
+							"frontend/tailwind",
+							"frontend/forms"
+						]
+					},
+					{
+						"group": "Deployment",
+						"icon": "upload",
+						"pages": [
+							"deployment/overview",
+							"deployment/vercel",
+							"deployment/coolify"
+						]
+					},
+					{
+						"group": "Bugs & Errors",
+						"icon": "bug",
+						"pages": [
+							"errors/troubleshooting",
+							"errors/database",
+							"errors/authentication",
+							"errors/api"
+						]
+					},
+					{
+						"group": "Clean Code",
+						"icon": "list-check",
+						"pages": [
+							"clean-code/checklist"
+						]
+					}
+				]
+			}
+		]
+	},
+	"logo": {
+		"light": "/logo-light.svg",
+		"dark": "/logo-dark.svg"
+	},
+	"favicon": "/favicon.svg",
+	"footer": {
+		"socials": {
+			"github": "https://github.com/codelifynet/turbostack-lite"
+		}
+	}
+}

@@ -1,0 +1,180 @@
+---
+title: Introduction
+description: Welcome to TurboStack - Modern fullstack monorepo starter
+---
+
+# Welcome to TurboStack 🚀
+
+TurboStack is a **production-ready fullstack monorepo starter** built with cutting-edge technologies. Ship faster with a complete authentication system, payment integration, and beautiful UI components.
+
+<Frame>
+  <img
+    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=400&fit=crop"
+    alt="Modern development workspace"
+    className="rounded-lg"
+  />
+</Frame>
+
+## Why TurboStack?
+
+<CardGroup cols={3}>
+  <Card title="Lightning Fast" icon="bolt">
+    Powered by **Bun runtime** for blazing fast server performance and instant
+    hot reload
+  </Card>
+  <Card title="Type Safe" icon="shield-check">
+    End-to-end **TypeScript** with strict mode enabled across frontend and
+    backend
+  </Card>
+  <Card title="Production Ready" icon="rocket">
+    Complete **auth**, **payments**, and **email** - ready to deploy today
+  </Card>
+</CardGroup>
+
+---
+
+## Tech Stack
+
+<Tabs>
+  <Tab title="Frontend" icon="browser">
+    | Technology | Version | Description | | ---------------- | ------- |
+    -------------------------------------------- | | **Next.js** | 16 | React
+    framework with App Router & Turbopack | | **React** | 19 | Latest React with
+    Server Components | | **Tailwind CSS** | v4 | Utility-first CSS with
+    `@theme` variables | | **shadcn/ui** | Latest | Beautiful, accessible React
+    components |
+  </Tab>
+  <Tab title="Backend" icon="server">
+    | Technology | Version | Description | | -------------- | ------- |
+    ----------------------------------------- | | **Elysia.js** | 1.x |
+    High-performance TypeScript web framework | | **Bun** | 1.1+ | Fast
+    JavaScript runtime & package manager | | **Prisma** | 6.x | Type-safe
+    database ORM with migrations | | **PostgreSQL** | 16 | Reliable relational
+    database |
+  </Tab>
+  <Tab title="Services" icon="plug">
+    | Service | Purpose | | ------------------- |
+    ----------------------------------------- | | **Resend** | Transactional
+    emails with React Email | | **Polar.sh** | Payments, subscriptions &
+    customer portal | | **JWT + Argon2** | Secure authentication | |
+    **OpenAPI/Swagger** | Auto-generated API documentation |
+  </Tab>
+</Tabs>
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph Frontend["🖥️ Frontend (Next.js 16)"]
+        A[App Router] --> B[React 19 Components]
+        B --> C[shadcn/ui]
+        B --> D[Tailwind CSS v4]
+    end
+
+    subgraph Backend["⚡ Backend (Elysia.js)"]
+        E[API Routes] --> F[Auth Service]
+        E --> G[Email Service]
+        E --> H[Polar Service]
+    end
+
+    subgraph Database["🗄️ Database"]
+        I[(PostgreSQL)]
+        J[Prisma ORM]
+    end
+
+    subgraph Packages["📦 Shared Packages"]
+        K[@repo/database]
+        L[@repo/validations]
+        M[@repo/types]
+    end
+
+    Frontend -->|API Calls| Backend
+    Backend --> J
+    J --> I
+    Backend --> K
+    Frontend --> L
+    Frontend --> M
+```
+
+---
+
+## Features
+
+<AccordionGroup>
+  <Accordion title="🔐 Complete Authentication System" icon="lock">
+    - JWT + Session-based authentication
+    - Email verification flow
+    - Password reset with secure tokens
+    - Role-based access control (RBAC)
+    - Rate limiting protection
+    - Argon2 password hashing
+  </Accordion>
+
+<Accordion title="📧 Email Service (Resend)" icon="envelope">
+  - Beautiful React Email templates - Welcome, verification & password reset
+  emails - Easy template customization - Production-ready configuration
+</Accordion>
+
+<Accordion title="💳 Payments (Polar.sh)" icon="credit-card">
+  - One-time payments & subscriptions - Customer portal integration - Webhook
+  handling - Product & pricing management
+</Accordion>
+
+<Accordion title="🎨 UI Components (shadcn/ui)" icon="palette">
+  - 40+ accessible React components - Dark mode support with next-themes -
+  Tailwind CSS v4 integration - Fully customizable with CSS variables
+</Accordion>
+
+  <Accordion title="🧪 Testing Infrastructure" icon="flask">
+    - Unit tests with Vitest
+    - E2E tests with Playwright
+    - API mocking with MSW
+    - Code coverage reports
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Project Structure
+
+```
+turbostack/
+├── apps/
+│   ├── frontend/     # Next.js 16 frontend (port 4100)
+│   ├── backend/      # Elysia.js backend (port 4101)
+│   └── docs/         # Mintlify documentation (port 4102)
+├── packages/
+│   ├── database/     # Prisma schema & client
+│   ├── validations/  # Shared Zod schemas
+│   ├── types/        # TypeScript type definitions
+│   ├── ui/           # Shared UI components
+│   ├── eslint-config/        # ESLint configurations
+│   └── typescript-config/    # TypeScript configurations
+└── turbo.json        # Turborepo configuration
+```
+
+---
+
+## Quick Links
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get up and running in **5 minutes** with step-by-step guide
+  </Card>
+  <Card title="Project Structure" icon="folder-tree" href="/project-structure">
+    Deep dive into the **codebase organization**
+  </Card>
+  <Card title="Authentication" icon="lock" href="/backend/authentication">
+    Complete **auth system** with JWT & sessions
+  </Card>
+  <Card title="API Reference" icon="code" href="/backend/elysia">
+    Explore the **Elysia.js API** endpoints
+  </Card>
+</CardGroup>
+
+<Tip>
+  **New to TurboStack?** Start with the [Quickstart Guide](/quickstart) to set
+  up your development environment in under 5 minutes.
+</Tip>

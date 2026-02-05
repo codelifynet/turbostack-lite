@@ -1,0 +1,440 @@
+---
+title: "AI Rules & Guidelines"
+description: "Learn how to use TurboStack's AI rules for consistent development with AI assistants"
+---
+
+## Overview
+
+TurboStack includes a comprehensive **`.ai/rules/`** directory containing development guidelines that help AI coding assistants (like GitHub Copilot, Cursor, Windsurf, Claude) understand your project's patterns and conventions.
+
+<Note>
+  **Why AI Rules?** These guidelines ensure that AI assistants generate code
+  that matches your project's architecture, coding style, and best practices
+  automatically.
+</Note>
+
+## 📁 Available Rules Files
+
+### Core Guidelines
+
+<CardGroup cols={2}>
+  <Card
+    title="backend.md"
+    icon="material-symbols:cloud-outline"
+    href="#backend-guidelines"
+  >
+    Complete backend development guide for Elysia.js, routes, services, and
+    authentication
+  </Card>
+  <Card
+    title="frontend.md"
+    icon="material-symbols:web"
+    href="#frontend-guidelines"
+  >
+    Frontend patterns for Next.js 16, React Server Components, and Zustand
+  </Card>
+  <Card
+    title="docs.md"
+    icon="material-symbols:menu-book"
+    href="#documentation-guidelines"
+  >
+    Mintlify documentation writing standards and MDX components
+  </Card>
+  <Card
+    title="database.md"
+    icon="material-symbols:database"
+    href="#database-guidelines"
+  >
+    Prisma ORM patterns, schema design, and migrations
+  </Card>
+</CardGroup>
+
+### Specialized Guidelines
+
+<CardGroup cols={2}>
+  <Card title="media.md" icon="material-symbols:perm-media">
+    Media upload service with UploadThing
+  </Card>
+  <Card title="security.md" icon="material-symbols:shield-lock">
+    Security best practices, authentication, and authorization
+  </Card>
+  <Card title="api-response-format.md" icon="material-symbols:code">
+    Standardized API response structure
+  </Card>
+  <Card title="email-templates.md" icon="material-symbols:mail">
+    React Email template development guide
+  </Card>
+  <Card title="swagger.md" icon="material-symbols:api">
+    OpenAPI/Swagger documentation standards
+  </Card>
+  <Card title="clean-code.md" icon="material-symbols:auto-fix">
+    Clean code principles and best practices
+  </Card>
+</CardGroup>
+
+---
+
+## 🤖 How AI Assistants Use These Rules
+
+When you ask an AI assistant to help with your code, it automatically reads the relevant `.ai/rules/` files to:
+
+1. **Understand your architecture** - Routes, services, database patterns
+2. **Follow your conventions** - Naming, file structure, import paths
+3. **Match your coding style** - TypeScript patterns, error handling
+4. **Use the right tools** - Correct libraries and frameworks
+5. **Generate consistent code** - Same patterns across the codebase
+
+### Example: Adding a New API Endpoint
+
+**Without AI Rules:**
+
+```typescript
+// AI might generate inconsistent code
+app.get("/api/products", (req, res) => {
+  const products = await db.products.findAll();
+  res.json(products); // ❌ No standard response format
+});
+```
+
+**With AI Rules (backend.md):**
+
+```typescript
+// AI generates code following your patterns
+export const productRoutes = new Elysia({ prefix: "/products" }).get(
+  "/",
+  async () => {
+    const products = await productService.getAll();
+    return { success: true, data: products }; // ✅ Standard format
+  },
+  {
+    detail: {
+      tags: ["Products"],
+      summary: "List all products",
+      // ✅ Auto-includes Swagger docs
+    },
+  }
+);
+```
+
+---
+
+## 📖 Using AI Rules in Your IDE
+
+### GitHub Copilot / VS Code
+
+<Steps>
+  <Step title="Enable Workspace Instructions">
+    Copilot automatically reads `.ai/rules/` when you reference specific files or patterns.
+  </Step>
+  
+  <Step title="Reference Rules in Comments">
+    ```typescript
+    // Following backend.md patterns for route creation
+    export const userRoutes = new Elysia({ prefix: "/users" })
+    ```
+  </Step>
+  
+  <Step title="Ask Specific Questions">
+    - "Create a new route following backend.md guidelines"
+    - "Add Swagger docs as described in backend.md"
+    - "Follow the media.md provider pattern"
+  </Step>
+</Steps>
+
+### Cursor IDE
+
+<Steps>
+  <Step title="Configure Rules Directory">
+    Cursor automatically detects `.ai/rules/` and `.cursor/rules/` directories.
+  </Step>
+
+<Step title="Reference in Chat">
+  Use `@rules` or mention specific files: - "@backend.md create a new products
+  endpoint" - "@frontend.md add a server component"
+</Step>
+
+  <Step title="Apply to Current File">
+    Cursor applies relevant rules based on your current file location
+    automatically.
+  </Step>
+</Steps>
+
+### Windsurf
+
+<Steps>
+  <Step title="Auto-Detection">
+    Windsurf reads `.windsurfrules` which references `.ai/rules/`.
+  </Step>
+
+  <Step title="Contextual Suggestions">
+    Suggestions automatically follow your project's patterns from the rules.
+  </Step>
+</Steps>
+
+---
+
+## 🎯 Quick Reference by Task
+
+<AccordionGroup>
+  <Accordion title="Creating Backend API Endpoints" icon="material-symbols:cloud-outline">
+    **Primary File:** [`.ai/rules/backend.md`](./.ai/rules/backend.md)
+    
+    **What You'll Learn:**
+    - Elysia.js route patterns
+    - Service layer architecture
+    - Swagger/OpenAPI documentation
+    - Authentication with Better-auth
+    - Rate limiting
+    - Error handling
+    
+    **Example Request:**
+    > "Create a new products API endpoint with CRUD operations following backend.md"
+  </Accordion>
+  
+  <Accordion title="Building Frontend Components" icon="material-symbols:web">
+    **Primary File:** [`.ai/rules/frontend.md`](./.ai/rules/frontend.md)
+    
+    **What You'll Learn:**
+    - Next.js 16 App Router patterns
+    - Server vs Client Components
+    - Zustand state management
+    - shadcn/ui component usage
+    - Form handling with React Hook Form
+    
+    **Example Request:**
+    > "Create a dashboard page following frontend.md patterns with server components"
+  </Accordion>
+  
+  <Accordion title="Working with Database" icon="material-symbols:database">
+    **Primary File:** [`.ai/rules/database.md`](./.ai/rules/database.md)
+    
+    **What You'll Learn:**
+    - Prisma schema patterns
+    - Creating migrations
+    - Query optimization
+    - Relation handling
+    
+    **Example Request:**
+    > "Add a products table to the schema following database.md conventions"
+  </Accordion>
+  
+  <Accordion title="Writing Documentation" icon="material-symbols:menu-book">
+    **Primary File:** [`.ai/rules/docs.md`](./.ai/rules/docs.md)
+    
+    **What You'll Learn:**
+    - Mintlify MDX format
+    - Component usage (Cards, Tabs, Steps)
+    - Frontmatter structure
+    - Code examples
+    
+    **Example Request:**
+    > "Create documentation for the products API following docs.md guidelines"
+  </Accordion>
+  
+  <Accordion title="Implementing File Uploads" icon="material-symbols:cloud-upload">
+    **Primary File:** [`.ai/rules/media.md`](./.ai/rules/media.md)
+    
+    **What You'll Learn:**
+    - UploadThing integration
+    - Media upload patterns
+    - File handling best practices
+    
+    **Example Request:**
+    > "Implement image upload using the provider pattern from media.md"
+  </Accordion>
+  
+  <Accordion title="Security Implementation" icon="material-symbols:shield-lock">
+    **Primary File:** [`.ai/rules/security.md`](./.ai/rules/security.md)
+    
+    **What You'll Learn:**
+    - Authentication patterns
+    - Authorization middleware
+    - Input validation
+    - Data sanitization
+    
+    **Example Request:**
+    > "Add role-based access control following security.md"
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 💡 Best Practices for Working with AI Rules
+
+### ✅ DO
+
+<CardGroup cols={2}>
+  <Card title="Be Specific" icon="material-symbols:target">
+    Reference exact rule files in your requests: - "Following backend.md,
+    create..." - "Using patterns from frontend.md..."
+  </Card>
+
+<Card title="Check Generated Code" icon="material-symbols:fact-check">
+  Always review AI-generated code to ensure it matches the rules and your needs.
+</Card>
+
+<Card title="Update Rules" icon="material-symbols:sync">
+  When you change patterns, update the corresponding `.ai/rules/` file so future
+  generations stay consistent.
+</Card>
+
+  <Card title="Provide Context" icon="material-symbols:chat">
+    Include the current file path or feature you're working on for better
+    context.
+  </Card>
+</CardGroup>
+
+### ❌ DON'T
+
+<Warning>
+  - Don't blindly accept AI suggestions without understanding them - Don't skip
+  reading the rules files yourself - they're valuable documentation - Don't
+  forget to update rules when you change project patterns - Don't ignore
+  validation - AI can make mistakes
+</Warning>
+
+---
+
+## 🔄 Keeping Rules Updated
+
+The AI rules are living documents that should evolve with your project:
+
+<Steps>
+  <Step title="After Major Changes">
+    When you refactor architecture or change patterns, update the relevant
+    `.ai/rules/` file.
+  </Step>
+
+<Step title="Document New Patterns">
+  If you create a new pattern (like a new service structure), add it to the
+  rules.
+</Step>
+
+<Step title="Review Periodically">
+  Every few months, review rules files to ensure they match your current
+  codebase.
+</Step>
+
+  <Step title="Team Alignment">
+    Make sure all team members know about and follow the rules files.
+  </Step>
+</Steps>
+
+---
+
+## 📚 Complete Rules Index
+
+| File                     | Purpose                 | When to Use                               |
+| ------------------------ | ----------------------- | ----------------------------------------- |
+| `backend.md`             | Backend API development | Creating routes, services, authentication |
+| `frontend.md`            | Frontend UI development | Building pages, components, forms         |
+| `docs.md`                | Documentation writing   | Adding MDX documentation                  |
+| `database.md`            | Database patterns       | Schema changes, migrations, queries       |
+| `media.md`               | Media/upload service    | File uploads, image handling              |
+| `security.md`            | Security practices      | Auth, validation, permissions             |
+| `api-response-format.md` | API response structure  | Standardizing API responses               |
+| `email-templates.md`     | Email templates         | Creating React Email templates            |
+| `swagger.md`             | OpenAPI docs            | API documentation                         |
+| `clean-code.md`          | Code quality            | General coding standards                  |
+| `structure.md`           | Project structure       | Understanding monorepo layout             |
+| `technologies.md`        | Tech stack              | Technology choices and versions           |
+| `path-aliases.md`        | Import paths            | Using `@/` path aliases                   |
+
+---
+
+## 🎓 Example Workflows
+
+### Workflow 1: Adding a New Feature
+
+```bash
+1. Read relevant rule file (e.g., backend.md)
+2. Ask AI: "Following backend.md, create a products API with CRUD operations"
+3. AI generates routes, services, and Swagger docs
+4. Review and test generated code
+5. Commit changes
+```
+
+### Workflow 2: Fixing a Bug
+
+```bash
+1. Identify the layer (route, service, database)
+2. Reference appropriate rule file
+3. Ask AI: "Fix this validation error following backend.md patterns"
+4. AI suggests fix matching project conventions
+5. Apply and test
+```
+
+### Workflow 3: Refactoring
+
+```bash
+1. Update the relevant .ai/rules/ file with new pattern
+2. Ask AI: "Refactor this code to match updated backend.md"
+3. AI refactors using new conventions
+4. Update other files consistently
+```
+
+---
+
+## 🔗 IDE-Specific Configurations
+
+<Tabs>
+  <Tab title="Cursor">
+    Cursor reads from `.cursor/rules/*.mdc` which links to `.ai/rules/`.
+    **Usage:** - `@backend.md` in chat - Auto-applies rules to current file
+  </Tab>
+
+<Tab title="GitHub Copilot">
+  Copilot uses `.github/copilot-instructions.md` which references `.ai/rules/`.
+  **Usage:** - Comment references: `// Following backend.md` - Chat: "Use
+  backend.md patterns"
+</Tab>
+
+<Tab title="Windsurf">
+  Windsurf reads `.windsurfrules` with symlinks to `.ai/rules/`. **Usage:** -
+  Automatic context from file location - Mention rule names in requests
+</Tab>
+
+  <Tab title="Claude/Agent">
+    Agents read directly from `.ai/rules/` and `.agent/rules/`. **Usage:** -
+    Include `#file:.ai/rules/backend.md` in prompts - Reference specific
+    sections
+  </Tab>
+</Tabs>
+
+---
+
+## 🚀 Getting Started
+
+<Steps>
+  <Step title="Browse the Rules">
+    Explore the [`.ai/rules/`](/.ai/rules/) directory to see what's available.
+  </Step>
+
+<Step title="Read Relevant Files">
+  Read the rules files relevant to your current task.
+</Step>
+
+<Step title="Reference in AI Requests">
+  Mention specific rule files when asking AI for help.
+</Step>
+
+  <Step title="Verify Generated Code">
+    Always review and test AI-generated code before committing.
+  </Step>
+</Steps>
+
+---
+
+## 📖 Related Documentation
+
+- [Project Structure](/project-structure) - Overall monorepo organization
+- [Backend Guidelines](/backend/elysia) - Elysia.js framework overview
+- [Frontend Guidelines](/frontend/nextjs) - Next.js App Router overview
+- [Database Schema](/database/schema) - Prisma schema reference
+
+---
+
+<Info>
+  **Pro Tip:** The more specific you are when referencing rules files, the
+  better the AI-generated code will match your project's patterns!
+</Info>

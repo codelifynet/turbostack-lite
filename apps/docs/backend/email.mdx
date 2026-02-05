@@ -1,0 +1,280 @@
+---
+title: Email Service
+description: Transactional emails with Resend and React Email
+---
+
+# Email Service
+
+TurboStack uses **Resend** for transactional emails with **React Email** for beautiful, responsive templates.
+
+<Frame caption="Email Flow">
+```mermaid
+sequenceDiagram
+    participant A as ⚡ API
+    participant S as 📧 Email Service
+    participant R as 🔵 Resend
+    participant U as 📬 User Inbox
+
+    A->>S: sendVerificationEmail(user, token)
+    S->>S: Render React Email template
+    S->>R: POST /emails (HTML + Text)
+    R-->>S: { id: "email_xxx" }
+    R->>U: Deliver email
+    S-->>A: Email sent successfully
+
+````
+</Frame>
+
+---
+
+## Features
+
+<CardGroup cols={3}>
+  <Card title="React Email" icon="react">
+    Build emails with React components
+  </Card>
+  <Card title="Responsive" icon="mobile">
+    Works on all email clients
+  </Card>
+  <Card title="Type Safe" icon="code">
+    Full TypeScript support
+  </Card>
+</CardGroup>
+
+---
+
+## Email Templates
+
+TurboStack includes these pre-built email templates:
+
+<AccordionGroup>
+  <Accordion title="Welcome Email" icon="hand-wave" defaultOpen>
+    Sent after successful registration.
+
+    **Contains:**
+    - Personalized greeting
+    - Quick start tips
+    - Link to dashboard
+
+    ```typescript
+    await sendWelcomeEmail({
+      to: user.email,
+      name: user.name,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Email Verification" icon="envelope-circle-check">
+    Sent to verify user's email address.
+
+    **Contains:**
+    - Verification link (valid 24 hours)
+    - App branding
+
+    ```typescript
+    await sendVerificationEmail({
+      to: user.email,
+      name: user.name,
+      token: verificationToken,
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Password Reset" icon="key">
+    Sent when user requests password reset.
+
+    **Contains:**
+    - Secure reset link (valid 1 hour)
+    - Security notice
+
+    ```typescript
+    await sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      token: resetToken,
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Setup
+
+<Steps>
+  <Step title="Create Resend Account">
+    Sign up at [resend.com](https://resend.com) and get your API key.
+  </Step>
+
+  <Step title="Configure Environment">
+    Add to your `.env` file:
+
+    ```bash
+    RESEND_API_KEY=re_your_api_key_here
+    FROM_EMAIL=noreply@yourdomain.com
+    APP_NAME=TurboStack
+    FRONTEND_URL=http://localhost:4100
+    ```
+  </Step>
+
+  <Step title="Verify Domain (Production)">
+    Add DNS records in Resend dashboard to send from your domain.
+  </Step>
+</Steps>
+
+<Warning>
+  In development without `RESEND_API_KEY`, emails are logged to console instead of being sent.
+</Warning>
+
+---
+
+## Using the Email Service
+
+```typescript
+// apps/api/src/services/email.service.tsx
+import { Resend } from "resend";
+import { VerificationEmail } from "../emails/verification";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function sendVerificationEmail({
+  to,
+  name,
+  token,
+}: {
+  to: string;
+  name: string;
+  token: string;
+}) {
+  const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+
+  await resend.emails.send({
+    from: `${process.env.APP_NAME} <${process.env.FROM_EMAIL}>`,
+    to,
+    subject: "Verify your email address",
+    react: <VerificationEmail name={name} url={verificationUrl} />,
+  });
+}
+````
+
+---
+
+## Creating Custom Templates
+
+<Steps>
+  <Step title="Create Template Component">
+    ```tsx
+    // apps/api/src/emails/invoice.tsx
+    import {
+      Body,
+      Container,
+      Head,
+      Heading,
+      Html,
+      Preview,
+      Section,
+      Text,
+    } from "@react-email/components";
+
+    interface InvoiceEmailProps {
+      customerName: string;
+      amount: number;
+      invoiceId: string;
+    }
+
+    export function InvoiceEmail({
+      customerName,
+      amount,
+      invoiceId
+    }: InvoiceEmailProps) {
+      return (
+        <Html>
+          <Head />
+          <Preview>Your invoice #{invoiceId}</Preview>
+          <Body style={main}>
+            <Container style={container}>
+              <Heading>Invoice #{invoiceId}</Heading>
+              <Text>Hi {customerName},</Text>
+              <Text>
+                Your payment of ${amount} has been received.
+              </Text>
+              <Section style={footer}>
+                <Text>Thank you for your business!</Text>
+              </Section>
+            </Container>
+          </Body>
+        </Html>
+      );
+    }
+
+    const main = { backgroundColor: "#f6f9fc" };
+    const container = { padding: "40px" };
+    const footer = { marginTop: "32px" };
+    ```
+
+  </Step>
+
+  <Step title="Add Send Function">
+    ```typescript
+    // email.service.tsx
+    export async function sendInvoiceEmail({
+      to,
+      customerName,
+      amount,
+      invoiceId,
+    }) {
+      await resend.emails.send({
+        from: `Billing <${process.env.FROM_EMAIL}>`,
+        to,
+        subject: `Invoice #${invoiceId}`,
+        react: (
+          <InvoiceEmail
+            customerName={customerName}
+            amount={amount}
+            invoiceId={invoiceId}
+          />
+        ),
+      });
+    }
+    ```
+  </Step>
+
+  <Step title="Use in Routes">
+    ```typescript
+    // In your route handler
+    await sendInvoiceEmail({
+      to: customer.email,
+      customerName: customer.name,
+      amount: 99.99,
+      invoiceId: "INV-001",
+    });
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Available Components
+
+React Email provides these components:
+
+| Component        | Description                  |
+| ---------------- | ---------------------------- |
+| `Html`           | Root component               |
+| `Head`           | Document head                |
+| `Body`           | Email body                   |
+| `Container`      | Centered container           |
+| `Section`        | Content section              |
+| `Row` / `Column` | Layout components            |
+| `Heading`        | h1-h6 headings               |
+| `Text`           | Paragraph text               |
+| `Link`           | Hyperlink                    |
+| `Button`         | CTA button                   |
+| `Img`            | Image                        |
+| `Hr`             | Horizontal rule              |
+| `Preview`        | Preview text (inbox snippet) |
+
+<Tip>
+  Preview your emails during development by rendering them in a test route or
+  using the [React Email preview tool](https://react.email/docs/cli).
+</Tip>

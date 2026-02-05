@@ -1,0 +1,46 @@
+{
+	"name": "turbostack",
+	"version": "1.0.0",
+	"private": true,
+	"packageManager": "bun@1.1.45",
+	"scripts": {
+		"build": "bun run check-types && turbo run build",
+		"start": "concurrently --names \"api,web\" -c \"blue,green\" \"bun run start:api\" \"bun run start:web\"",
+		"start:api": "cd apps/api && bun run start",
+		"start:web": "cd apps/web && bun run start",
+		"dev": "turbo run dev",
+		"dev:web": "turbo run dev --filter=web",
+		"dev:api": "turbo run dev --filter=api",
+		"dev:docs": "turbo run dev --filter=docs",
+		"lint": "turbo run lint",
+		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
+		"check-types": "turbo run check-types",
+		"db:generate": "turbo run db:generate --filter=@repo/database",
+		"db:push": "turbo run db:push --filter=@repo/database",
+		"db:migrate": "turbo run db:migrate --filter=@repo/database",
+		"db:reset": "turbo run db:reset --filter=@repo/database",
+		"db:seed": "turbo run db:seed --filter=@repo/database",
+		"db:studio": "turbo run db:studio --filter=@repo/database",
+		"db:start": "bun run db:reset && bun run db:push && bun run db:seed",
+		"polar:setup": "./scripts/setup-polar.sh",
+		"deploy:setup": "./scripts/setup-deployment.sh",
+		"docker:build:web": "turbo run build --filter=web",
+		"docker:build:api": "turbo run build --filter=api",
+		"clean": "turbo run clean",
+		"ngrok": "ngrok http 4101"
+	},
+	"devDependencies": {
+		"concurrently": "^9.2.1",
+		"prettier": "^3.7.4",
+		"turbo": "^2.8.1",
+		"typescript": "5.9.2"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"dependencies": {}
+}

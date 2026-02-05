@@ -1,0 +1,13 @@
+# Dependencies
+node_modules
+
+# Environment
+.env.local
+.env.*.local
+
+# Build outputs
+dist
+.turbo
+
+# Logs
+*.log

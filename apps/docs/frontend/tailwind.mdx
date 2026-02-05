@@ -1,0 +1,242 @@
+---
+title: Tailwind CSS
+description: Styling with Tailwind CSS v4
+---
+
+# Tailwind CSS
+
+TurboStack uses **Tailwind CSS v4** with the new CSS-first configuration approach.
+
+<CardGroup cols={3}>
+  <Card title="Lightning Fast" icon="bolt">
+    New Oxide engine for faster builds
+  </Card>
+  <Card title="CSS Variables" icon="palette">
+    Native CSS custom properties
+  </Card>
+  <Card title="Dark Mode" icon="moon">
+    Built-in dark mode support
+  </Card>
+</CardGroup>
+
+---
+
+## Configuration
+
+Tailwind v4 uses CSS-based configuration with `@theme`:
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-primary: oklch(0.7 0.15 250);
+  --color-secondary: oklch(0.8 0.1 200);
+  --color-accent: oklch(0.65 0.2 30);
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Spacing */
+  --spacing-container: 80rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+}
+```
+
+---
+
+## Theme Customization
+
+<Tabs>
+  <Tab title="Colors" icon="palette">
+    Define your color palette:
+
+    ```css
+    @theme {
+      /* Brand Colors */
+      --color-brand: oklch(0.6 0.2 260);
+      --color-brand-light: oklch(0.8 0.15 260);
+      --color-brand-dark: oklch(0.4 0.2 260);
+
+      /* Semantic Colors */
+      --color-success: oklch(0.7 0.2 145);
+      --color-warning: oklch(0.8 0.15 80);
+      --color-error: oklch(0.6 0.25 25);
+      --color-info: oklch(0.7 0.15 230);
+    }
+    ```
+
+    **Usage:**
+    ```html
+    <div class="bg-brand text-brand-light">
+      Branded content
+    </div>
+    ```
+
+  </Tab>
+  <Tab title="Typography" icon="font">
+    Configure fonts and text styles:
+
+    ```css
+    @theme {
+      --font-heading: "Cal Sans", "Inter", sans-serif;
+      --font-body: "Inter", system-ui, sans-serif;
+      --font-code: "JetBrains Mono", monospace;
+
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --text-3xl: 1.875rem;
+    }
+    ```
+
+    **Usage:**
+    ```html
+    <h1 class="font-heading text-3xl">
+      Heading
+    </h1>
+    ```
+
+  </Tab>
+  <Tab title="Spacing" icon="arrows-left-right">
+    Define custom spacing values:
+
+    ```css
+    @theme {
+      --spacing-page: 2rem;
+      --spacing-section: 4rem;
+      --spacing-header: 4rem;
+    }
+    ```
+
+    **Usage:**
+    ```html
+    <section class="py-section px-page">
+      Content with custom spacing
+    </section>
+    ```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Dark Mode
+
+Dark mode is configured with CSS variables:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+  }
+}
+```
+
+Toggle with `next-themes`:
+
+```tsx
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </Button>
+  );
+}
+```
+
+---
+
+## Useful Utilities
+
+<AccordionGroup>
+  <Accordion title="Container" icon="square">
+    ```html
+    <div class="container mx-auto px-4 max-w-7xl">
+      Centered, responsive container
+    </div>
+    ```
+  </Accordion>
+
+<Accordion title="Flexbox Grid" icon="table-columns">
+  ```html
+  <div class="flex flex-col md:flex-row gap-4">
+    <div class="flex-1">Column 1</div>
+    <div class="flex-1">Column 2</div>
+    <div class="flex-1">Column 3</div>
+  </div>
+  ```
+</Accordion>
+
+<Accordion title="CSS Grid" icon="grid">
+  ```html
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div>Card 1</div>
+    <div>Card 2</div>
+    <div>Card 3</div>
+  </div>
+  ```
+</Accordion>
+
+  <Accordion title="Animations" icon="wand-magic-sparkles">
+    ```html
+    <!-- Hover effects -->
+    <button class="transition-all hover:scale-105 hover:shadow-lg">
+      Hover me
+    </button>
+
+    <!-- Built-in animations -->
+    <div class="animate-pulse">Loading...</div>
+    <div class="animate-spin">🔄</div>
+    <div class="animate-bounce">⬇️</div>
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="DO" icon="check" color="#22c55e">
+    - ✅ Use semantic class names - ✅ Extract repeated styles to components -
+    ✅ Use CSS variables for theming - ✅ Leverage `@apply` sparingly
+  </Card>
+  <Card title="DON'T" icon="xmark" color="#ef4444">
+    - ❌ Override Tailwind defaults unnecessarily - ❌ Use inline styles over
+    utilities - ❌ Create deeply nested class strings - ❌ Ignore responsive
+    design
+  </Card>
+</CardGroup>
+
+<Tip>
+  Use the [Tailwind CSS
+  IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
+  VS Code extension for autocomplete and linting.
+</Tip>

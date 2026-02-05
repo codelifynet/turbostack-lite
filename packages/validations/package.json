@@ -1,0 +1,48 @@
+{
+	"name": "@repo/validations",
+	"version": "0.1.0",
+	"type": "module",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./auth": {
+			"types": "./src/auth.ts",
+			"default": "./src/auth.ts"
+		},
+		"./user": {
+			"types": "./src/user.ts",
+			"default": "./src/user.ts"
+		},
+		"./customer": {
+			"types": "./src/customer.ts",
+			"default": "./src/customer.ts"
+		},
+		"./dashboard": {
+			"types": "./src/dashboard.ts",
+			"default": "./src/dashboard.ts"
+		},
+		"./product": {
+			"types": "./src/product.ts",
+			"default": "./src/product.ts"
+		},
+		"./profile": {
+			"types": "./src/profile.ts",
+			"default": "./src/profile.ts"
+		}
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"clean": "echo 'No clean needed for validations'"
+	},
+	"dependencies": {
+		"zod": "^3.25.0"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "*",
+		"typescript": "5.9.2"
+	}
+}

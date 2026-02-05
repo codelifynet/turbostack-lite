@@ -1,0 +1,220 @@
+---
+title: Polar.sh
+description: Payments and subscriptions with Polar.sh
+---
+
+# Polar.sh Integration
+
+TurboStack integrates **Polar.sh** for payments, subscriptions, and customer management.
+
+<CardGroup cols={3}>
+  <Card title="One-time Payments" icon="credit-card">
+    Accept single purchases
+  </Card>
+  <Card title="Subscriptions" icon="rotate">
+    Recurring billing support
+  </Card>
+  <Card title="Customer Portal" icon="user">
+    Self-service billing management
+  </Card>
+</CardGroup>
+
+---
+
+## Features
+
+- ✅ Product catalog management
+- ✅ Secure checkout sessions
+- ✅ Webhook handling
+- ✅ Customer subscriptions
+- ✅ Usage-based billing support
+
+---
+
+## Setup
+
+<Steps>
+  <Step title="Create Polar Account">
+    Sign up at [polar.sh](https://polar.sh) and create an organization.
+  </Step>
+
+<Step title="Get API Keys">
+  Go to **Settings → Developers** and create an access token.
+</Step>
+
+  <Step title="Configure Environment">
+    Add to your `.env`:
+
+    ```bash
+    POLAR_ACCESS_TOKEN=polar_at_xxxxx
+    POLAR_WEBHOOK_SECRET=polar_ws_xxxxx
+    ```
+
+  </Step>
+
+  <Step title="Set Up Webhook">
+    In Polar dashboard, add webhook URL:
+
+    ```
+    https://your-api.com/webhooks/polar
+    ```
+
+    Subscribe to events:
+    - `order.created`
+    - `subscription.created`
+    - `subscription.updated`
+    - `subscription.canceled`
+
+  </Step>
+</Steps>
+
+---
+
+## API Endpoints
+
+| Endpoint                 | Method | Description             |
+| ------------------------ | ------ | ----------------------- |
+| `/polar/products`        | GET    | List all products       |
+| `/polar/checkout`        | POST   | Create checkout session |
+| `/polar/customer-portal` | GET    | Get portal URL          |
+| `/webhooks/polar`        | POST   | Handle Polar webhooks   |
+
+---
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Get Products" icon="list">
+    ```typescript
+    // Frontend
+    const response = await fetch("/api/polar/products");
+    const { data } = await response.json();
+
+    // Response
+    {
+      success: true,
+      data: {
+        products: [
+          {
+            id: "prod_xxx",
+            name: "Pro Plan",
+            description: "Full access to all features",
+            prices: [
+              { id: "price_xxx", amount: 2900, interval: "month" }
+            ]
+          }
+        ]
+      }
+    }
+    ```
+
+  </Tab>
+  <Tab title="Create Checkout" icon="cart-shopping">
+    ```typescript
+    // Frontend
+    const response = await fetch("/api/polar/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: "prod_xxx",
+        priceId: "price_xxx",
+      }),
+    });
+
+    const { data } = await response.json();
+
+    // Redirect to checkout
+    window.location.href = data.checkoutUrl;
+    ```
+
+  </Tab>
+  <Tab title="Customer Portal" icon="user">
+    ```typescript
+    // Get portal URL for current user
+    const response = await fetch("/api/polar/customer-portal", {
+      credentials: "include",
+    });
+
+    const { data } = await response.json();
+
+    // Redirect to manage subscription
+    window.location.href = data.portalUrl;
+    ```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Webhook Handling
+
+Polar sends webhook events for order and subscription updates:
+
+```typescript
+// apps/api/src/routes/webhooks.ts
+export const webhookRoutes = new Elysia({ prefix: "/webhooks" }).post(
+  "/polar",
+  async ({ body, headers }) => {
+    // Verify webhook signature
+    const signature = headers["polar-signature"];
+    const isValid = await verifyPolarWebhook(body, signature);
+
+    if (!isValid) {
+      return { success: false, error: "Invalid signature" };
+    }
+
+    const event = body as PolarWebhookEvent;
+
+    switch (event.type) {
+      case "order.created":
+        await handleOrderCreated(event.data);
+        break;
+      case "subscription.created":
+        await handleSubscriptionCreated(event.data);
+        break;
+      case "subscription.canceled":
+        await handleSubscriptionCanceled(event.data);
+        break;
+    }
+
+    return { success: true };
+  }
+);
+```
+
+---
+
+## Database Models
+
+TurboStack stores payment data in these models:
+
+```prisma
+model Purchase {
+  id           String   @id @default(cuid())
+  userId       String
+  productId    String
+  polarOrderId String   @unique
+  amount       Int
+  currency     String   @default("USD")
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                  String    @id @default(cuid())
+  userId              String
+  polarSubscriptionId String    @unique
+  status              String    // active, canceled, past_due
+  planId              String
+  currentPeriodEnd    DateTime
+  canceledAt          DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
+```
+
+<Tip>
+  Use the Polar dashboard to create and manage products. The API endpoints in
+  TurboStack handle checkout and subscription management automatically.
+</Tip>

@@ -1,0 +1,287 @@
+---
+title: Quickstart
+description: Get TurboStack up and running in 5 minutes
+---
+
+# Quickstart
+
+Get your TurboStack project running locally in just a few steps.
+
+<Info>
+  **One-click deploy available!** Skip the local setup and deploy directly to
+  Vercel with a single click.
+</Info>
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/codelifynet/turbostack-lite&project-name=turbostack&repository-name=turbostack&root-directory=apps/web&env=DATABASE_URL,JWT_SECRET,SESSION_SECRET,NEXT_PUBLIC_API_URL&envDescription=Required%20environment%20variables%20for%20turbostack)
+
+---
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Bun 1.1+" icon="bolt" color="#fbf0df">
+    Fast JavaScript runtime and package manager
+  </Card>
+  <Card title="Node.js 18+" icon="node-js" color="#68a063">
+    Required for some development tools
+  </Card>
+</CardGroup>
+
+<Tabs>
+  <Tab title="macOS" icon="apple">
+    ```bash
+    # Install Bun with Homebrew
+    brew install oven-sh/bun/bun
+
+    # Or with curl
+    curl -fsSL https://bun.sh/install | bash
+    ```
+
+  </Tab>
+  <Tab title="Linux" icon="linux">
+    ```bash
+    # Install Bun with curl
+    curl -fsSL https://bun.sh/install | bash
+    ```
+  </Tab>
+  <Tab title="Windows" icon="windows">
+    ```powershell
+    # Install Bun with PowerShell
+    powershell -c "irm bun.sh/install.ps1 | iex"
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Installation
+
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone https://github.com/codelifynet/turbostack-lite.git
+    cd turbostack
+    ```
+  </Step>
+
+<Step title="Install Dependencies">
+  ```bash bun install ```
+  <Tip>Bun installs dependencies significantly faster than npm or yarn!</Tip>
+</Step>
+
+  <Step title="Configure Environment">
+    Copy the example environment file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Update the `.env` file with your configuration:
+
+    <Tabs>
+      <Tab title="Required" icon="asterisk">
+        ```bash
+        # Database (PostgreSQL)
+        DATABASE_URL="postgresql://user:password@localhost:5432/turbostack"
+
+        # Security Keys (change in production!)
+        JWT_SECRET="your-super-secret-jwt-key-min-32-characters"
+        SESSION_SECRET="another-super-secret-session-key"
+
+        # App URLs
+        FRONTEND_URL="http://localhost:4100"
+        NEXT_PUBLIC_API_URL="http://localhost:4101"
+        NODE_ENV="development"
+        ```
+      </Tab>
+      <Tab title="Email (Resend)" icon="envelope">
+        ```bash
+        # Get your API key from resend.com
+        RESEND_API_KEY="re_your_api_key_here"
+        FROM_EMAIL="noreply@yourdomain.com"
+        ```
+      </Tab>
+      <Tab title="Payments (Polar)" icon="credit-card">
+        ```bash
+        # Get your keys from polar.sh
+        POLAR_ACCESS_TOKEN="polar_at_xxxxx"
+        POLAR_WEBHOOK_SECRET="polar_ws_xxxxx"
+        ```
+      </Tab>
+    </Tabs>
+
+  </Step>
+
+  <Step title="Setup Database">
+    Push the Prisma schema to your database:
+
+    ```bash
+    bun run db:push
+    ```
+
+    <AccordionGroup>
+      <Accordion title="Don't have PostgreSQL?" icon="database">
+        Start PostgreSQL with Docker:
+
+        ```bash
+        docker run -d \
+          --name turbostack-postgres \
+          -e POSTGRES_PASSWORD=postgres \
+          -e POSTGRES_DB=turbostack \
+          -p 5432:5432 \
+          postgres:16
+        ```
+
+        Then use this connection string:
+
+        ```bash
+        DATABASE_URL="postgresql://postgres:postgres@localhost:5432/turbostack"
+        ```
+      </Accordion>
+    </AccordionGroup>
+
+  </Step>
+
+  <Step title="Start Development Server">
+    ```bash
+    bun run dev
+    ```
+
+    <Check>
+      All services will start automatically with Turborepo!
+    </Check>
+
+  </Step>
+</Steps>
+
+---
+
+## Access Your Apps
+
+Once the development server is running:
+
+| Application    | URL                                                     | Description        |
+| -------------- | ------------------------------------------------------- | ------------------ |
+| 🖥️ **Web**     | [localhost:4100](http://localhost:4100)                 | Next.js frontend   |
+| ⚡ **API**     | [localhost:4101](http://localhost:4101)                 | Elysia.js backend  |
+| 📚 **Swagger** | [localhost:4101/openapi](http://localhost:4101/openapi) | API documentation  |
+| 📖 **Docs**    | [localhost:4102](http://localhost:4102)                 | This documentation |
+
+<Frame caption="TurboStack Architecture Overview">
+```mermaid
+graph LR
+    subgraph Development
+        A[bun run dev] --> B[Turborepo]
+        B --> C[🖥️ Web :4100]
+        B --> D[⚡ API :4101]
+        B --> E[📖 Docs :4102]
+    end
+
+    C --> F[(PostgreSQL)]
+    D --> F
+
+````
+</Frame>
+
+---
+
+## Useful Commands
+
+<CardGroup cols={2}>
+  <Card title="Development" icon="code">
+    ```bash
+    bun run dev       # Start all apps
+    bun run dev:web   # Start only web
+    bun run dev:api   # Start only API
+    ```
+  </Card>
+  <Card title="Database" icon="database">
+    ```bash
+    bun run db:push    # Push schema
+    bun run db:studio  # Prisma Studio
+    bun run db:migrate # Run migrations
+    ```
+  </Card>
+  <Card title="Build & Test" icon="vial">
+    ```bash
+    bun run build # Build all
+    bun run test  # Run tests
+    bun run lint  # Lint code
+    ```
+  </Card>
+  <Card title="Type Check" icon="check">
+    ```bash
+    bun run check-types # Type check all
+    ```
+  </Card>
+</CardGroup>
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Port already in use" icon="triangle-exclamation">
+    If you see `EADDRINUSE` error:
+
+    ```bash
+    # Find process using the port
+    lsof -i :4100
+
+    # Kill the process
+    kill -9 <PID>
+    ```
+  </Accordion>
+
+  <Accordion title="Database connection failed" icon="database">
+    1. Make sure PostgreSQL is running
+    2. Check your `DATABASE_URL` in `.env`
+    3. Ensure the database exists:
+
+    ```bash
+    createdb turbostack
+    ```
+  </Accordion>
+
+  <Accordion title="Prisma client not generated" icon="gear">
+    If you see Prisma errors, regenerate the client:
+
+    ```bash
+    bun run db:generate
+    ```
+  </Accordion>
+
+  <Accordion title="Bun installation issues" icon="bug">
+    Try reinstalling Bun:
+
+    ```bash
+    curl -fsSL https://bun.sh/install | bash
+    source ~/.bashrc  # or ~/.zshrc
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/backend/authentication">
+    Set up user registration, login & email verification
+  </Card>
+  <Card title="Email Service" icon="envelope" href="/backend/email">
+    Configure Resend for transactional emails
+  </Card>
+  <Card title="Payments" icon="credit-card" href="/backend/polar">
+    Integrate Polar.sh for subscriptions
+  </Card>
+  <Card title="Database Schema" icon="database" href="/database/schema">
+    Customize your database models
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Pro tip:** Start by registering a user, verifying the email, and exploring
+  the admin dashboard to see all features in action!
+</Tip>
+````

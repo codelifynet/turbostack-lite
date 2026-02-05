@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+
+# ============================================
+# Docs Dockerfile for Mintlify
+# ============================================
+
+# ============================================
+# RUNNER (Mintlify doesn't need a build step)
+# ============================================
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ARG PORT=4102
+
+ENV NODE_ENV=production
+ENV PORT=${PORT}
+ENV HOSTNAME=0.0.0.0
+
+# Install Mintlify CLI
+RUN npm install -g mintlify@latest
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 docsuser
+
+# Copy docs content from repo root context
+COPY --chown=docsuser:nodejs apps/docs/ ./
+
+USER docsuser
+EXPOSE ${PORT}
+
+# Start Mintlify dev server
+CMD sh -c "mintlify dev --port ${PORT} --host 0.0.0.0"

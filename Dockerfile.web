@@ -1,0 +1,77 @@
+# syntax=docker/dockerfile:1
+
+# ============================================
+# Web Dockerfile for Next.js 16 + Bun
+# ============================================
+
+# ============================================
+# BUILDER
+# ============================================
+FROM node:22-alpine AS builder
+
+# Install Bun
+RUN npm install -g bun
+
+WORKDIR /app
+
+# Copy package files (use wildcard for lockfile flexibility)
+COPY package.json bun.lock* bun.lockb* ./
+COPY turbo.json ./
+
+ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
+
+# Copy workspace package.json files
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+COPY apps/docs/package.json ./apps/docs/
+COPY packages/database/package.json ./packages/database/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/types/package.json ./packages/types/
+COPY packages/validations/package.json ./packages/validations/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/typescript-config/package.json ./packages/typescript-config/
+
+# Install all dependencies
+RUN bun install
+
+# Copy all source files
+COPY . .
+
+# Generate Prisma client (needed for types)
+RUN cd packages/database && bunx --bun prisma generate
+
+# Set required build-time environment variables for Next.js
+ARG NEXT_PUBLIC_API_URL=http://localhost:4101
+ARG PORT=4100
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV PORT=${PORT}
+
+# Build web app
+RUN cd apps/web && NEXT_PRIVATE_SKIP_PATCHING=1 bun run build
+
+# ============================================
+# RUNNER
+# ============================================
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ARG PORT=4100
+
+ENV NODE_ENV=production
+ENV PORT=${PORT}
+ENV HOSTNAME=0.0.0.0
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy standalone build output
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+
+USER nextjs
+EXPOSE ${PORT}
+
+CMD ["node", "apps/web/server.js"]

@@ -1,0 +1,76 @@
+---
+title: "Troubleshooting Overview"
+description: "Quick reference for common errors and their solutions in TurboStack"
+---
+
+# Troubleshooting Guide
+
+This section covers common errors you may encounter while developing with TurboStack. Errors are categorized for easy navigation.
+
+## Quick Fixes
+
+Most issues can be resolved with these commands:
+
+```bash
+# 1. Regenerate Prisma client
+bun run db:generate
+
+# 2. Sync database schema
+bun run db:push
+
+# 3. Restart development server
+bun run dev
+```
+
+## Error Categories
+
+<CardGroup cols={2}>
+  <Card title="Database Errors" icon="database" href="/errors/database">
+    Schema sync issues, connection problems, and Prisma errors
+  </Card>
+  <Card title="Authentication Errors" icon="lock" href="/errors/authentication">
+    Better Auth issues, password hashing, and session problems
+  </Card>
+  <Card title="API Errors" icon="code" href="/errors/api">
+    Validation errors, email issues, and file upload problems
+  </Card>
+</CardGroup>
+
+## Development Tips
+
+### Quick Database Reset
+
+If you encounter persistent database issues:
+
+```bash
+# Drop and recreate database
+bun run db:push --force-reset
+
+# Or with Docker
+docker-compose down -v
+docker-compose up -d postgres
+bun run db:push
+```
+
+### Checking Database State
+
+```bash
+# Open Prisma Studio
+bun run db:studio
+```
+
+### Clearing Build Cache
+
+```bash
+# Clear Turbo cache
+bun run clean
+
+# Or manually
+rm -rf node_modules/.cache
+rm -rf .turbo
+```
+
+<Tip>
+  When in doubt, run these commands in order: 1. `bun run db:generate` 2. `bun
+  run db:push` 3. Restart dev server
+</Tip>
