@@ -113,7 +113,7 @@ export function ProfileTab() {
         toast.error(
           typeof result.error === "string"
             ? result.error
-            : "Failed to update profile",
+            : "Failed to update profile"
         );
       }
     } catch (error) {
@@ -142,19 +142,13 @@ export function ProfileTab() {
 
     try {
       setIsUploadingAvatar(true);
-      const result = await userService.uploadAvatar(file);
+      // Dummy upload - just create a blob URL and simulate upload
+      await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate upload delay
 
-      if (result.success && result.data) {
-        setProfileData((prev) => ({ ...prev, image: result.data?.url || "" }));
-        toast.success("Avatar updated successfully");
-        await refetch();
-      } else {
-        toast.error(
-          typeof result.error === "string"
-            ? result.error
-            : "Failed to upload avatar",
-        );
-      }
+      const newImageUrl = URL.createObjectURL(file);
+      setProfileData((prev) => ({ ...prev, image: newImageUrl }));
+      toast.success("Avatar updated successfully");
+      await refetch();
     } catch (error) {
       console.error("Failed to upload avatar:", error);
       toast.error("Failed to upload avatar");

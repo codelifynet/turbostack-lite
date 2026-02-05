@@ -39,7 +39,11 @@ export function Header({ user: initialUser }: HeaderProps) {
 
   const navLinks = [
     { href: "#features", label: "Features" },
-    { href: "https://github.com/turbostack", label: "GitHub" },
+    { href: "#benefits", label: "Benefits" },
+    { href: "#tech", label: "Tech Stack" },
+    { href: "#quick-start", label: "Quick Start" },
+    { href: "#testimonials", label: "Testimonials" },
+    { href: "https://github.com/codelifynet/turbostack-lite", label: "GitHub" },
   ];
 
   return (

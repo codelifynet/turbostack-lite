@@ -104,7 +104,8 @@ export async function getSession(): Promise<SessionData | null> {
 
     const data = await response.json();
 
-    if (!data.user) {
+    // Check if data is null or doesn't have user property
+    if (!data || !data.user) {
       return null;
     }
 

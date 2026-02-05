@@ -148,19 +148,15 @@ export function ProfileClient() {
       setSelectedImage(null);
     }
 
-    const file = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
-
     setIsUploadingAvatar(true);
     try {
-      const response = await userService.uploadAvatar(file);
-      if (response.success && response.data) {
-        toast.success("Avatar uploaded successfully");
-        const newImageUrl = response.data.url;
-        setProfile((prev) => (prev ? { ...prev, image: newImageUrl } : null));
-        updateUser({ image: newImageUrl });
-      } else {
-        toast.error(response.message || "Failed to upload avatar");
-      }
+      // Dummy upload - just create a blob URL and simulate upload
+      await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate upload delay
+
+      const newImageUrl = URL.createObjectURL(croppedBlob);
+      toast.success("Avatar uploaded successfully");
+      setProfile((prev) => (prev ? { ...prev, image: newImageUrl } : null));
+      updateUser({ image: newImageUrl });
     } catch {
       toast.error("Failed to upload avatar");
     } finally {
@@ -181,14 +177,17 @@ export function ProfileClient() {
 
     setIsUploadingAvatar(true);
     try {
-      const response = await userService.deleteAvatar();
-      if (response.success) {
-        toast.success("Avatar removed successfully");
-        setProfile((prev) => (prev ? { ...prev, image: null } : null));
-        updateUser({ image: null });
-      } else {
-        toast.error(response.message || "Failed to remove avatar");
+      // Dummy delete - just simulate removal
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delete delay
+
+      // Revoke blob URL if it's a blob URL
+      if (profile.image.startsWith("blob:")) {
+        URL.revokeObjectURL(profile.image);
       }
+
+      toast.success("Avatar removed successfully");
+      setProfile((prev) => (prev ? { ...prev, image: null } : null));
+      updateUser({ image: null });
     } catch {
       toast.error("Failed to remove avatar");
     } finally {
@@ -216,7 +215,7 @@ export function ProfileClient() {
       if (hasPassword) {
         response = await userService.changePassword(
           passwordForm.currentPassword,
-          passwordForm.newPassword,
+          passwordForm.newPassword
         );
       } else {
         response = await userService.setPassword(passwordForm.newPassword);
@@ -226,7 +225,7 @@ export function ProfileClient() {
         toast.success(
           hasPassword
             ? "Password changed successfully"
-            : "Password set successfully",
+            : "Password set successfully"
         );
         setPasswordForm({
           currentPassword: "",
@@ -281,7 +280,6 @@ export function ProfileClient() {
           <ProfileOverviewCard
             profile={profile}
             profileForm={profileForm}
-						
             isUploadingAvatar={isUploadingAvatar}
             fileInputRef={fileInputRef}
             onFileSelect={handleFileSelect}
