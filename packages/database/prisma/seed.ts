@@ -16,26 +16,19 @@ async function main() {
   // Seed Users with Simple Roles
   // ============================================
   console.log("👤 Seeding users...");
-  const superAdminPassword = await hashPassword("superadmin123!");
-  const adminPassword = await hashPassword("admin123!");
-  const userPassword = await hashPassword("user123!");
+  const adminPassword = await hashPassword("demo123");
+  const userPassword = await hashPassword("demo123");
 
   const users = [
     {
-      email: "superadmin@turbostack.pro",
-      name: "Super Admin",
-      role: "SUPER_ADMIN",
-      password: superAdminPassword,
-    },
-    {
-      email: "admin@turbostack.pro",
+      email: "admin@demo.com",
       name: "Admin User",
       role: "ADMIN",
       password: adminPassword,
     },
     {
-      email: "user@turbostack.pro",
-      name: "Regular User",
+      email: "user@demo.com",
+      name: "Demo User",
       role: "USER",
       password: userPassword,
     },
@@ -102,10 +95,9 @@ async function main() {
   // ============================================
   // Summary
   // ============================================
-  console.log("📋 Login credentials:");
-  console.log("  Super Admin: superadmin@turbostack.prp / superadmin123!");
-  console.log("  Admin:       admin@turbostack.pro / admin123!");
-  console.log("  User:        user@turbostack.pro / user123!");
+  console.log("📋 Demo login credentials:");
+  console.log("  Admin: admin@demo.com / demo123");
+  console.log("  User:  user@demo.com / demo123");
   console.log("\n🎉 Seed completed successfully!");
 }
 

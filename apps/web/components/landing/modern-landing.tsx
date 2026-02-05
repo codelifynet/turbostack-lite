@@ -252,7 +252,7 @@ export function ModernLanding() {
       </section>
 
       {/* Section 3: Benefits */}
-      <section className="py-24 px-6">
+      <section id="benefits" className="py-24 px-6">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -284,7 +284,7 @@ export function ModernLanding() {
       </section>
 
       {/* Section 4: Tech Stack */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section id="tech" className="py-24 px-6 bg-muted/30">
         <div className="mx-auto max-w-5xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -322,7 +322,7 @@ export function ModernLanding() {
       </section>
 
       {/* Section 5: Architecture */}
-      <section className="py-24 px-6">
+      <section id="architecture" className="py-24 px-6">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -377,7 +377,7 @@ export function ModernLanding() {
       </section>
 
       {/* Section 6: Quick Start */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section id="quick-start" className="py-24 px-6 bg-muted/30">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -565,7 +565,7 @@ export function ModernLanding() {
       </section>
 
       {/* Section 9: Testimonials / Social Proof */}
-      <section className="py-24 px-6">
+      <section id="testimonials" className="py-24 px-6">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
