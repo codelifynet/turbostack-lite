@@ -16,6 +16,44 @@ Production-ready monorepo starter kit with Next.js 16, Elysia.js, and Prisma. Bu
 - 💳 **Polar.sh** - Integrated payment processing
 - 📁 **UploadThing** - File uploads made simple
 
+## 🤖 AI-Powered Development Rules
+
+TurboStack Lite includes intelligent development guidelines and automated code quality enforcement:
+
+### 📋 Code Quality Rules
+- **Auto-formatting** - Prettier integration with custom rules
+- **ESLint Configuration** - Strict TypeScript and React rules
+- **Import Organization** - Automatic import sorting and optimization
+- **Unused Code Detection** - Identify and remove dead code automatically
+
+### 🔍 Smart Validation
+- **Type Safety** - Comprehensive Zod schema validation
+- **API Contract Validation** - Automatic request/response validation
+- **Database Schema Sync** - Prisma type-safe database operations
+- **Environment Variable Validation** - Runtime env var checking
+
+### 🚨 Security Best Practices
+- **Authentication Guards** - Route-level security enforcement
+- **Input Sanitization** - XSS and injection prevention
+- **Secret Management** - Environment-based configuration
+- **Rate Limiting** - Built-in API protection
+
+### ⚡ Performance Optimization
+- **Bundle Analysis** - Webpack bundle optimization
+- **Image Optimization** - Automatic Next.js image processing
+- **Database Indexing** - Query performance monitoring
+- **Caching Strategy** - Multi-layer caching implementation
+
+### 🎯 Development Workflow
+- **Git Hooks** - Pre-commit quality checks
+- **Automated Testing** - Unit and integration test enforcement
+- **Build Validation** - Type-checking before deployment
+- **Documentation Generation** - Auto-generated API docs
+
+> **💎 Pro Tip**: These AI rules ensure your codebase maintains enterprise-grade quality standards automatically.
+
+![AI Development Rules](./ai-rules-folder.jpg)
+
 ## 🚀 Quick Start
 
 ```bash
