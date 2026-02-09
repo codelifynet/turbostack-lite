@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@repo/database";
-import { env } from "@backend/lib/env";
+import { env } from "@api/lib/env";
+import { logger } from "@api/lib/logger";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../emails";
 
 /**
@@ -18,8 +19,6 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        required: true,
-        defaultValue: "USER",
       },
     },
   },
@@ -35,7 +34,7 @@ export const auth = betterAuth({
     // Send password reset email
     sendResetPassword: async ({ user, url, token }, request) => {
       const resetPasswordUrl = `${env.FRONTEND_URL}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
-      console.log("📧 Sending password reset email to:", user.email);
+      logger.info({ email: user.email }, "Sending password reset email");
       try {
         await sendPasswordResetEmail({
           to: user.email,
@@ -43,9 +42,9 @@ export const auth = betterAuth({
           token,
           userName: user.name || undefined,
         });
-        console.log("✅ Password reset email sent successfully");
+        logger.info({ email: user.email }, "Password reset email sent successfully");
       } catch (error) {
-        console.error("❌ Failed to send password reset email:", error);
+        logger.error({ err: error, email: user.email }, "Failed to send password reset email");
       }
     },
 
@@ -56,7 +55,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }, request) => {
       const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${token}`;
-      console.log("📧 Sending verification email to:", user.email);
+      logger.info({ email: user.email }, "Sending verification email");
       try {
         await sendVerificationEmail({
           to: user.email,
@@ -64,9 +63,9 @@ export const auth = betterAuth({
           token,
           userName: user.name || undefined,
         });
-        console.log("✅ Verification email sent successfully");
+        logger.info({ email: user.email }, "Verification email sent successfully");
       } catch (error) {
-        console.error("❌ Failed to send verification email:", error);
+        logger.error({ err: error, email: user.email }, "Failed to send verification email");
       }
     },
     sendVerificationOnSignUp: true,
@@ -78,11 +77,13 @@ export const auth = betterAuth({
     google: {
       clientId: env.GOOGLE_CLIENT_ID || "",
       clientSecret: env.GOOGLE_CLIENT_SECRET || "",
+      // Callback URL: {baseURL}/api/auth/callback/google
     },
     // GitHub OAuth
     github: {
       clientId: env.GITHUB_CLIENT_ID || "",
       clientSecret: env.GITHUB_CLIENT_SECRET || "",
+      // Callback URL: {baseURL}/api/auth/callback/github
     },
   },
 
@@ -94,31 +95,20 @@ export const auth = betterAuth({
     },
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day (updates session if older than this)
+    cookieName: "turbostack_session",
   },
 
   // Base URL for email links and OAuth callbacks
-  baseURL: env.BETTER_AUTH_URL || env.CORS_ORIGIN,
+  baseURL: env.BETTER_AUTH_URL || env.FRONTEND_URL,
 
   // Trusted origins for CORS
-  trustedOrigins: [env.CORS_ORIGIN],
+  trustedOrigins: [env.FRONTEND_URL],
 
   // Advanced options
   advanced: {
     generateId: false, // Use Prisma's default cuid()
     crossSubDomainCookies: {
-      enabled: !!env.COOKIE_DOMAIN, // Enable if COOKIE_DOMAIN is set (production)
-      domain: env.COOKIE_DOMAIN, // e.g., ".turbostack.pro" for cross-subdomain cookies
-    },
-
-    cookies: {
-      session_token: {
-        // Production'da tarayıcılar Secure flag ile cookie'ye __Secure- öneki ekler
-        // Bu yüzden cookie ismini production'da __Secure- ile başlatıyoruz
-        name:
-          env.NODE_ENV === "production"
-            ? "__Secure-turbostack_session_token"
-            : "turbostack_session_token",
-      },
+      enabled: false,
     },
   },
 });

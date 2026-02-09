@@ -43,72 +43,12 @@ export type Verification = Prisma.VerificationModel
  */
 export type UserSettings = Prisma.UserSettingsModel
 /**
- * Model ImageOptimizationSettings
- * 
- */
-export type ImageOptimizationSettings = Prisma.ImageOptimizationSettingsModel
-/**
  * Model MediaUploadSettings
  * 
  */
 export type MediaUploadSettings = Prisma.MediaUploadSettingsModel
 /**
- * Model Subscription
- * 
- */
-export type Subscription = Prisma.SubscriptionModel
-/**
- * Model Product
- * 
- */
-export type Product = Prisma.ProductModel
-/**
- * Model Price
- * 
- */
-export type Price = Prisma.PriceModel
-/**
- * Model Order
- * 
- */
-export type Order = Prisma.OrderModel
-/**
- * Model Customer
- * 
- */
-export type Customer = Prisma.CustomerModel
-/**
- * Model Role
- * 
- */
-export type Role = Prisma.RoleModel
-/**
- * Model RolePermission
- * 
- */
-export type RolePermission = Prisma.RolePermissionModel
-/**
- * Model Permission
- * 
- */
-export type Permission = Prisma.PermissionModel
-/**
- * Model Task
- * 
- */
-export type Task = Prisma.TaskModel
-/**
- * Model Version
- * 
- */
-export type Version = Prisma.VersionModel
-/**
  * Model NotificationSettings
  * 
  */
 export type NotificationSettings = Prisma.NotificationSettingsModel
-/**
- * Model ApiKey
- * 
- */
-export type ApiKey = Prisma.ApiKeyModel

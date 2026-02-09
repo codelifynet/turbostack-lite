@@ -112,7 +112,7 @@ export const productRoutes = new Elysia({ prefix: "/products" }).get(
       summary: "List all products",
       // ✅ Auto-includes Swagger docs
     },
-  }
+  },
 );
 ```
 
@@ -149,7 +149,7 @@ export const productRoutes = new Elysia({ prefix: "/products" }).get(
   </Step>
 
 <Step title="Reference in Chat">
-  Use `@rules` or mention specific files: - "@backend.md create a new products
+  Use `@rules` or mention specific files: - "@api.md create a new products
   endpoint" - "@frontend.md add a server component"
 </Step>
 
@@ -380,7 +380,7 @@ The AI rules are living documents that should evolve with your project:
 <Tabs>
   <Tab title="Cursor">
     Cursor reads from `.cursor/rules/*.mdc` which links to `.ai/rules/`.
-    **Usage:** - `@backend.md` in chat - Auto-applies rules to current file
+    **Usage:** - `@api.md` in chat - Auto-applies rules to current file
   </Tab>
 
 <Tab title="GitHub Copilot">

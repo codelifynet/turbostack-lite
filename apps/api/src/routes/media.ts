@@ -1,8 +1,8 @@
 import { Elysia, t } from "elysia";
-import { AppError } from "@backend/lib/errors";
-import { requireAdmin, successResponse } from "@backend/lib/route-helpers";
-import * as uploadService from "@backend/services/upload.service";
-import { PAGINATION } from "@backend/constants";
+import { AppError } from "@api/lib/errors";
+import { requireAdmin, successResponse } from "@api/lib/route-helpers";
+import * as uploadService from "@api/services/upload.service";
+import { PAGINATION } from "@api/constants";
 
 export const mediaRoutes = new Elysia({ prefix: "/media" })
   .get(

@@ -56,20 +56,8 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   UserSettings: 'UserSettings',
-  ImageOptimizationSettings: 'ImageOptimizationSettings',
   MediaUploadSettings: 'MediaUploadSettings',
-  Subscription: 'Subscription',
-  Product: 'Product',
-  Price: 'Price',
-  Order: 'Order',
-  Customer: 'Customer',
-  Role: 'Role',
-  RolePermission: 'RolePermission',
-  Permission: 'Permission',
-  Task: 'Task',
-  Version: 'Version',
-  NotificationSettings: 'NotificationSettings',
-  ApiKey: 'ApiKey'
+  NotificationSettings: 'NotificationSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -78,12 +66,12 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  * Enums
  */
 
-export const TransactionIsolationLevel = {
+export const TransactionIsolationLevel = runtime.makeStrictEnum({
   ReadUncommitted: 'ReadUncommitted',
   ReadCommitted: 'ReadCommitted',
   RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
-} as const
+} as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
@@ -164,21 +152,6 @@ export const UserSettingsScalarFieldEnum = {
 export type UserSettingsScalarFieldEnum = (typeof UserSettingsScalarFieldEnum)[keyof typeof UserSettingsScalarFieldEnum]
 
 
-export const ImageOptimizationSettingsScalarFieldEnum = {
-  id: 'id',
-  isGlobal: 'isGlobal',
-  enabled: 'enabled',
-  maxWidth: 'maxWidth',
-  maxHeight: 'maxHeight',
-  quality: 'quality',
-  format: 'format',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ImageOptimizationSettingsScalarFieldEnum = (typeof ImageOptimizationSettingsScalarFieldEnum)[keyof typeof ImageOptimizationSettingsScalarFieldEnum]
-
-
 export const MediaUploadSettingsScalarFieldEnum = {
   id: 'id',
   isGlobal: 'isGlobal',
@@ -190,149 +163,6 @@ export const MediaUploadSettingsScalarFieldEnum = {
 } as const
 
 export type MediaUploadSettingsScalarFieldEnum = (typeof MediaUploadSettingsScalarFieldEnum)[keyof typeof MediaUploadSettingsScalarFieldEnum]
-
-
-export const SubscriptionScalarFieldEnum = {
-  id: 'id',
-  polarSubscriptionId: 'polarSubscriptionId',
-  userId: 'userId',
-  productId: 'productId',
-  priceId: 'priceId',
-  status: 'status',
-  currentPeriodStart: 'currentPeriodStart',
-  currentPeriodEnd: 'currentPeriodEnd',
-  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
-  canceledAt: 'canceledAt',
-  polarCustomerId: 'polarCustomerId',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
-
-
-export const ProductScalarFieldEnum = {
-  id: 'id',
-  polarProductId: 'polarProductId',
-  name: 'name',
-  description: 'description',
-  medias: 'medias',
-  isRecurring: 'isRecurring',
-  isArchived: 'isArchived',
-  polarSyncStatus: 'polarSyncStatus',
-  polarSyncError: 'polarSyncError',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
-
-
-export const PriceScalarFieldEnum = {
-  id: 'id',
-  polarPriceId: 'polarPriceId',
-  productId: 'productId',
-  priceAmount: 'priceAmount',
-  priceCurrency: 'priceCurrency',
-  recurringInterval: 'recurringInterval',
-  type: 'type',
-  isArchived: 'isArchived',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type PriceScalarFieldEnum = (typeof PriceScalarFieldEnum)[keyof typeof PriceScalarFieldEnum]
-
-
-export const OrderScalarFieldEnum = {
-  id: 'id',
-  polarOrderId: 'polarOrderId',
-  userId: 'userId',
-  productId: 'productId',
-  priceId: 'priceId',
-  amount: 'amount',
-  currency: 'currency',
-  status: 'status',
-  polarCustomerId: 'polarCustomerId',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
-
-
-export const CustomerScalarFieldEnum = {
-  id: 'id',
-  polarCustomerId: 'polarCustomerId',
-  userId: 'userId',
-  email: 'email',
-  name: 'name',
-  metadata: 'metadata',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
-
-
-export const RoleScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
-
-
-export const RolePermissionScalarFieldEnum = {
-  id: 'id',
-  roleId: 'roleId',
-  permissionId: 'permissionId'
-} as const
-
-export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
-
-
-export const PermissionScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
-
-
-export const TaskScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  description: 'description',
-  status: 'status',
-  order: 'order',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
-
-
-export const VersionScalarFieldEnum = {
-  id: 'id',
-  version: 'version',
-  status: 'status',
-  releaseDate: 'releaseDate',
-  description: 'description',
-  changes: 'changes',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type VersionScalarFieldEnum = (typeof VersionScalarFieldEnum)[keyof typeof VersionScalarFieldEnum]
 
 
 export const NotificationSettingsScalarFieldEnum = {
@@ -350,43 +180,12 @@ export const NotificationSettingsScalarFieldEnum = {
 export type NotificationSettingsScalarFieldEnum = (typeof NotificationSettingsScalarFieldEnum)[keyof typeof NotificationSettingsScalarFieldEnum]
 
 
-export const ApiKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  name: 'name',
-  keyPrefix: 'keyPrefix',
-  keyHash: 'keyHash',
-  lastUsedAt: 'lastUsedAt',
-  expiresAt: 'expiresAt',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof ApiKeyScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: 'DbNull',
-  JsonNull: 'JsonNull'
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
-
-
-export const JsonNullValueInput = {
-  JsonNull: 'JsonNull'
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -403,13 +202,4 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
-export const JsonNullValueFilter = {
-  DbNull: 'DbNull',
-  JsonNull: 'JsonNull',
-  AnyNull: 'AnyNull'
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

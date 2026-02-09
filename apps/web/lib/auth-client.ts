@@ -1,15 +1,13 @@
 import { createAuthClient } from "better-auth/react";
-import type { Session as BetterAuthSession } from "better-auth";
-import { env } from "@/lib/env";
-
-const API_URL = env.NEXT_PUBLIC_API_URL;
 
 /**
  * Better Auth React Client
  * Handles authentication state and actions
+ *
+ * Note: baseURL is omitted to use same-origin requests via Next.js rewrites
+ * This ensures cookies are set on the frontend domain (domain.com) instead of backend (api.domain.com)
  */
 export const authClient = createAuthClient({
-  baseURL: API_URL,
   basePath: `/api/auth`,
   fetchOptions: {
     credentials: "include",
@@ -26,53 +24,35 @@ export const authClient = createAuthClient({
   },
 });
 
-// Type definitions with role field
-export type UserWithRole = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  email: string;
-  emailVerified: boolean;
-  name: string;
-  image?: string | null;
-  role: "USER" | "ADMIN" | "SUPERADMIN";
+// Export types with role field
+export type User = typeof authClient.$Infer.Session["user"] & {
+  role?: string;
 };
 
-export type SessionWithRole = {
-  user: UserWithRole;
-  session: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    expiresAt: Date;
-    ipAddress?: string;
-    userAgent?: string;
-  };
+export type UserWithRole = typeof authClient.$Infer.Session["user"] & {
+  role: string;
 };
 
-// Export types
-export type Session = SessionWithRole;
-export type User = UserWithRole;
+export type Session = Omit<typeof authClient.$Infer.Session, "user"> & {
+  user: User;
+};
 
-// Export better-auth client and typed hooks
-const { useSession: useSessionOriginal, getSession: getSessionOriginal, signIn, signUp, signOut } = authClient;
+// Export typed hooks and actions
+export const { signIn, signUp, signOut, useSession: _useSession, getSession } = authClient;
 
-// Create a wrapper to cast session type properly
+// Re-export useSession with proper typing
 export function useSession() {
-  const session = useSessionOriginal();
+  const result = _useSession();
   return {
-    ...session,
-    data: session.data as SessionWithRole | null,
+    ...result,
+    data: result.data
+      ? ({
+          ...result.data,
+          user: {
+            ...result.data.user,
+            role: (result.data.user as unknown as User).role,
+          },
+        } as Session)
+      : null,
   };
 }
-
-export async function getSession() {
-  const session = await getSessionOriginal();
-  if (!session || "error" in session) {
-    return null;
-  }
-  return session as SessionWithRole;
-}
-
-// Re-export other auth functions
-export { signIn, signUp, signOut };

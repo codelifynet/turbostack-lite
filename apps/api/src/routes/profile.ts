@@ -1,8 +1,8 @@
 import { Elysia, t } from "elysia";
-import * as userService from "@backend/services/user.service";
-import * as uploadService from "@backend/services/upload.service";
-import { getSession } from "@backend/lib/route-helpers";
-import { AppError } from "@backend/lib/errors";
+import * as userService from "@api/services/user.service";
+import * as uploadService from "@api/services/upload.service";
+import { getSession } from "@api/lib/route-helpers";
+import { AppError } from "@api/lib/errors";
 import { prisma } from "@repo/database";
 import { verifyPassword, hashPassword } from "better-auth/crypto";
 
@@ -410,4 +410,3 @@ export const profileRoutes = new Elysia({ prefix: "/profile" })
       }),
     },
   );
-

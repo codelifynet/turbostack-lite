@@ -1,5 +1,5 @@
 import { prisma } from "@repo/database";
-import { AppError } from "@backend/lib/errors";
+import { AppError } from "@api/lib/errors";
 import type { DashboardStats, RecentActivity } from "@repo/types";
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -28,13 +28,13 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     throw new AppError(
       "DASHBOARD_ERROR",
       "Failed to fetch dashboard stats",
-      500
+      500,
     );
   }
 };
 
 export const getRecentActivity = async (
-  limit = 10
+  limit = 10,
 ): Promise<RecentActivity> => {
   try {
     const [recentUsers] = await Promise.all([
@@ -60,7 +60,7 @@ export const getRecentActivity = async (
     throw new AppError(
       "DASHBOARD_ERROR",
       "Failed to fetch recent activity",
-      500
+      500,
     );
   }
 };

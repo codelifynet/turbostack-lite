@@ -23,47 +23,12 @@ export interface SessionData {
 }
 
 /**
- * Get session cookie name based on environment
- * Better Auth'un cookie yapılandırmasına göre cookie ismini döndürür
- * Production'da tarayıcılar Secure flag ile cookie'ye __Secure- öneki ekler
- */
-function getSessionCookieName(): string {
-  const isProduction = process.env.NODE_ENV === "production";
-  return isProduction
-    ? "__Secure-turbostack_session_token"
-    : "turbostack_session_token";
-}
-
-/**
- * Get session token from cookies
- * Better Auth'un cookie'lerini okurken tüm olası cookie isimlerini kontrol eder
- */
-async function getSessionToken(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-
-  // Production cookie ismi (__Secure- öneki ile)
-  const productionCookieName = "__Secure-turbostack_session_token";
-  // Development cookie ismi
-  const developmentCookieName = "turbostack_session_token";
-
-  // Better Auth'un varsayılan cookie prefix'i ile (eğer kullanılıyorsa)
-  const betterAuthPrefix = "better-auth";
-  const prefixedProduction = `${betterAuthPrefix}.${productionCookieName}`;
-  const prefixedDevelopment = `${betterAuthPrefix}.${developmentCookieName}`;
-
-  // Tüm olası cookie isimlerini kontrol et
-  return (
-    cookieStore.get(productionCookieName)?.value ||
-    cookieStore.get(developmentCookieName)?.value ||
-    cookieStore.get(prefixedProduction)?.value ||
-    cookieStore.get(prefixedDevelopment)?.value ||
-    cookieStore.get("__Secure-turbostack_session_token")?.value ||
-    cookieStore.get("turbostack_session_token")?.value
-  );
-}
-
-/**
- * Get all cookies as a Cookie header string
+ * Tüm cookie'leri Cookie header string'ine dönüştürür.
+ * Server-side'dan backend'e istek atarken cookie'leri manuel iletmek için kullanılır.
+ *
+ * Next.js rewrite sayesinde cookie'ler domain.com'da set ediliyor.
+ * Middleware/Server Actions'da incoming request'ten cookie'leri okuyup
+ * backend'e Cookie header'ı olarak iletiyoruz.
  */
 async function getCookieHeader(): Promise<string> {
   const cookieStore = await cookies();
@@ -74,27 +39,36 @@ async function getCookieHeader(): Promise<string> {
 }
 
 /**
+ * Backend API URL (server-side direct call)
+ * Server-side'dan backend'e doğrudan istek atar (rewrite yerine).
+ */
+function getApiUrl(): string {
+  const apiUrl = env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    throw new Error("NEXT_PUBLIC_API_URL is not configured");
+  }
+  return apiUrl;
+}
+
+/**
  * Get the current session by validating with the API
- * Better Auth'un cookie'lerini otomatik olarak göndermesi için credentials: "include" kullanır
+ *
+ * Server-side'dan backend'e doğrudan istek atar.
+ * Cookie'ler incoming request'ten okunup Cookie header'ında iletilir.
  */
 export async function getSession(): Promise<SessionData | null> {
   try {
-    const apiUrl = env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      console.warn("API URL not configured");
+    const apiUrl = getApiUrl();
+    const cookieHeader = await getCookieHeader();
+
+    if (!cookieHeader) {
       return null;
     }
 
-    // Better Auth'un cookie'lerini otomatik olarak göndermesi için
-    // Tüm cookie'leri Cookie header'ına ekliyoruz
-    const cookieHeader = await getCookieHeader();
-
-    // Better-auth endpoint: /api/auth/get-session
     const response = await fetch(`${apiUrl}/api/auth/get-session`, {
       headers: {
         Cookie: cookieHeader,
       },
-      credentials: "include",
       cache: "no-store",
     });
 
@@ -104,7 +78,6 @@ export async function getSession(): Promise<SessionData | null> {
 
     const data = await response.json();
 
-    // Check if data is null or doesn't have user property
     if (!data || !data.user) {
       return null;
     }
@@ -136,24 +109,18 @@ export async function getCurrentUser(): Promise<User | null> {
 
 /**
  * Server action to log out the user
- * Better Auth'un cookie'lerini otomatik olarak göndermesi için credentials: "include" kullanır
  */
 export async function logoutAction() {
   try {
-    const apiUrl = env.NEXT_PUBLIC_API_URL;
-    if (apiUrl) {
-      // Better Auth'un cookie'lerini otomatik olarak göndermesi için
-      // Tüm cookie'leri Cookie header'ına ekliyoruz
-      const cookieHeader = await getCookieHeader();
+    const apiUrl = getApiUrl();
+    const cookieHeader = await getCookieHeader();
 
-      await fetch(`${apiUrl}${AUTH_ENDPOINTS.signOut}`, {
-        method: "POST",
-        headers: {
-          Cookie: cookieHeader,
-        },
-        credentials: "include",
-      });
-    }
+    await fetch(`${apiUrl}${AUTH_ENDPOINTS.signOut}`, {
+      method: "POST",
+      headers: {
+        Cookie: cookieHeader,
+      },
+    });
   } catch (error) {
     console.error("Logout error:", error);
   }
@@ -165,13 +132,10 @@ export async function logoutAction() {
  * Server action for forgot password
  */
 export async function forgotPasswordAction(
-  email: string
+  email: string,
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    const apiUrl = env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      return { success: false, message: "API URL not configured" };
-    }
+    const apiUrl = getApiUrl();
 
     const response = await fetch(`${apiUrl}${AUTH_ENDPOINTS.forgotPassword}`, {
       method: "POST",
@@ -199,10 +163,7 @@ export async function resetPasswordAction(data: {
   newPassword: string;
 }): Promise<{ success: boolean; message?: string }> {
   try {
-    const apiUrl = env.NEXT_PUBLIC_API_URL;
-    if (!apiUrl) {
-      return { success: false, message: "API URL not configured" };
-    }
+    const apiUrl = getApiUrl();
 
     const response = await fetch(`${apiUrl}${AUTH_ENDPOINTS.resetPassword}`, {
       method: "POST",

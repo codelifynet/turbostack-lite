@@ -22,9 +22,6 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:4100"),
   FRONTEND_URL: z.string().default("http://localhost:4100"),
 
-  // Cookie domain for cross-subdomain (e.g. .turbostack.pro when API and Web are on different subdomains)
-  COOKIE_DOMAIN: z.string().optional(),
-
   // Better Auth
   BETTER_AUTH_SECRET: z.string().optional(),
   BETTER_AUTH_URL: z.string().url().optional(),

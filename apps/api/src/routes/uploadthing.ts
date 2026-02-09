@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
-import { AppError } from "@backend/lib/errors";
-import { getSession } from "@backend/lib/route-helpers";
-import { utapi } from "@backend/lib/uploadthing";
+import { AppError } from "@api/lib/errors";
+import { getSession } from "@api/lib/route-helpers";
+import { utapi } from "@api/lib/uploadthing";
 
 export const uploadthingRoutes = new Elysia({ prefix: "/uploadthing" })
   .get("/", () => {

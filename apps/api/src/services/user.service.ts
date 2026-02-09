@@ -1,7 +1,7 @@
 import { prisma } from "@repo/database";
 import type { User, UserSettings } from "@repo/database";
-import { AppError } from "@backend/lib/errors";
-import { generateRandomPassword } from "@backend/lib/utils";
+import { AppError } from "@api/lib/errors";
+import { generateRandomPassword } from "@api/lib/utils";
 import type {
   UserListParams,
   CreateUserData,
@@ -11,7 +11,7 @@ import type {
 import { hashPassword } from "better-auth/crypto";
 
 export const getAllUsers = async (
-  params: UserListParams = {}
+  params: UserListParams = {},
 ): Promise<{ users: User[]; total: number; page: number; limit: number }> => {
   const { page = 1, limit = 20, search, role } = params;
   const skip = (page - 1) * limit;
@@ -74,7 +74,7 @@ export const getUserCount = async (): Promise<number> => {
 
 export const updateProfileImage = async (
   userId: string,
-  imageUrl: string | null
+  imageUrl: string | null,
 ): Promise<User> => {
   try {
     return await prisma.user.update({
@@ -86,7 +86,7 @@ export const updateProfileImage = async (
     throw new AppError(
       "IMAGE_UPDATE_ERROR",
       "Failed to update profile image",
-      500
+      500,
     );
   }
 };
@@ -192,7 +192,7 @@ export const adminCreateUser = async (data: {
       throw new AppError(
         "EMAIL_EXISTS",
         "A user with this email already exists",
-        400
+        400,
       );
     }
 
@@ -267,7 +267,7 @@ export const unverifyUserEmail = async (userId: string): Promise<User> => {
 
 export const updateUser = async (
   userId: string,
-  data: UpdateUserData
+  data: UpdateUserData,
 ): Promise<User> => {
   try {
     // Check if user is SUPER_ADMIN
@@ -322,7 +322,7 @@ export const deleteUser = async (userId: string): Promise<void> => {
 };
 
 export const getUserSettings = async (
-  userId: string
+  userId: string,
 ): Promise<UserSettings> => {
   try {
     let settings = await prisma.userSettings.findUnique({
@@ -341,14 +341,14 @@ export const getUserSettings = async (
     throw new AppError(
       "SETTINGS_FETCH_ERROR",
       "Failed to fetch user settings",
-      500
+      500,
     );
   }
 };
 
 export const updateUserSettings = async (
   userId: string,
-  data: UpdateUserSettingsData
+  data: UpdateUserSettingsData,
 ): Promise<UserSettings> => {
   try {
     await getUserSettings(userId);
@@ -362,14 +362,14 @@ export const updateUserSettings = async (
     throw new AppError(
       "SETTINGS_UPDATE_ERROR",
       "Failed to update user settings",
-      500
+      500,
     );
   }
 };
 
 export const isEmailTaken = async (
   email: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): Promise<boolean> => {
   try {
     const user = await prisma.user.findUnique({

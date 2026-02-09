@@ -1,6 +1,6 @@
 import { prisma } from "@repo/database";
-import { AppError } from "@backend/lib/errors";
-import { utapi } from "@backend/lib/uploadthing";
+import { AppError } from "@api/lib/errors";
+import { utapi } from "@api/lib/uploadthing";
 import type { UploadResult } from "@repo/types";
 
 export const uploadProfileImage = async (

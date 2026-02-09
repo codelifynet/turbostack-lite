@@ -1,5 +1,5 @@
-import { env } from "@backend/lib/env";
-import { sendEmail } from "@backend/lib/resend";
+import { env } from "@api/lib/env";
+import { sendEmail } from "@api/lib/resend";
 
 interface VerificationEmailData {
   to: string;

@@ -1,10 +1,10 @@
 import { Elysia, t } from "elysia";
-import { requireAdmin, successResponse } from "@backend/lib/route-helpers";
-import { AppError } from "@backend/lib/errors";
+import { requireAdmin, successResponse } from "@api/lib/route-helpers";
+import { AppError } from "@api/lib/errors";
 import {
   getMediaUploadSettings,
   updateMediaUploadSettings,
-} from "@backend/services/media-upload-settings.service";
+} from "@api/services/media-upload-settings.service";
 
 export const settingsMediaUploadRoutes = new Elysia({
   prefix: "/settings",

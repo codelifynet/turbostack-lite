@@ -1,5 +1,5 @@
 import { treaty } from "@elysiajs/eden";
-import type { App } from "@backend/index";
+import type { App } from "@api/index";
 import { env } from "@/lib/env";
 
 const API_BASE_URL = env.NEXT_PUBLIC_API_URL;

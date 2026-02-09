@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import * as os from "os";
-import { AppError } from "@backend/lib/errors";
+import { AppError } from "@api/lib/errors";
 import type { CPUInfo, MemoryInfo, DiskInfo, SystemInfo } from "@repo/types";
 
 const execAsync = promisify(exec);

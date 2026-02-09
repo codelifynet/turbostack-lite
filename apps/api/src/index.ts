@@ -3,11 +3,11 @@ import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { rateLimit } from "elysia-rate-limit";
 
-import { logger } from "@backend/lib/logger";
-import { env } from "@backend/lib/env";
-import { AppError } from "@backend/lib/errors";
-import { RATE_LIMIT } from "@backend/constants";
-import { auth } from "@backend/lib/auth";
+import { logger } from "@api/lib/logger";
+import { env } from "@api/lib/env";
+import { AppError } from "@api/lib/errors";
+import { RATE_LIMIT } from "@api/constants";
+import { auth } from "@api/lib/auth";
 import {
   healthRoutes,
   authRoutes,
@@ -18,7 +18,7 @@ import {
   mediaRoutes,
   uploadthingRoutes,
   systemRoutes,
-} from "@backend/routes";
+} from "@api/routes";
 
 /**
  * TurboStack Backend API
@@ -76,7 +76,7 @@ const app = new Elysia()
 
     logger.info(
       { requestId, method, path: url.pathname },
-      `[REQUEST] ${method} ${url.pathname}`
+      `[REQUEST] ${method} ${url.pathname}`,
     );
 
     return { requestId, startTime };
@@ -96,7 +96,7 @@ const app = new Elysia()
 
       logger.info(
         { requestId, method, path: url.pathname, status, duration },
-        `[RESPONSE] ${method} ${url.pathname} ${status} (${duration}ms)`
+        `[RESPONSE] ${method} ${url.pathname} ${status} (${duration}ms)`,
       );
     }
   })
@@ -108,7 +108,7 @@ const app = new Elysia()
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization", "x-request-id"],
-    })
+    }),
   )
 
   // Global rate limiting - 100 requests per minute
@@ -116,7 +116,7 @@ const app = new Elysia()
     rateLimit({
       duration: RATE_LIMIT.GLOBAL.duration,
       max: RATE_LIMIT.GLOBAL.max,
-    })
+    }),
   )
 
   // Global error handler - Standard API Response Format
@@ -127,7 +127,7 @@ const app = new Elysia()
       const err = error as any;
       logger.error(
         { requestId, code: err.code, error: err },
-        `[ERROR] ${err.code || "UNKNOWN"}: ${err.message}`
+        `[ERROR] ${err.code || "UNKNOWN"}: ${err.message}`,
       );
 
       // Standard API response format
@@ -163,11 +163,11 @@ const app = new Elysia()
             message = String(firstError.summary)
               .replace(
                 /Expected property '(\w+)' to be (\w+) but found: undefined/g,
-                "'$1' field is required"
+                "'$1' field is required",
               )
               .replace(
                 /Property '(\w+)' is missing/g,
-                "'$1' field is required"
+                "'$1' field is required",
               );
           } else if (firstError.path) {
             const fieldName = String(firstError.path).replace(/^\//, "");
@@ -185,11 +185,11 @@ const app = new Elysia()
             message = firstError.summary
               .replace(
                 /Expected property '(\w+)' to be (\w+) but found: undefined/g,
-                "'$1' field is required"
+                "'$1' field is required",
               )
               .replace(
                 /Property '(\w+)' is missing/g,
-                "'$1' field is required"
+                "'$1' field is required",
               );
           } else if (firstError.path) {
             const fieldName = firstError.path.replace(/^\//, "");
@@ -201,7 +201,7 @@ const app = new Elysia()
           message = errorObj.summary
             .replace(
               /Expected property '(\w+)' to be (\w+) but found: undefined/g,
-              "'$1' field is required"
+              "'$1' field is required",
             )
             .replace(/Property '(\w+)' is missing/g, "'$1' field is required");
         }
@@ -234,7 +234,7 @@ const app = new Elysia()
 
       logger.error(
         { requestId, error: message },
-        `[ERROR] VALIDATION: ${message}`
+        `[ERROR] VALIDATION: ${message}`,
       );
 
       return {
@@ -282,7 +282,7 @@ const app = new Elysia()
 
     logger.error(
       { requestId, code, error: errorMessage },
-      `[ERROR] ${code}: ${errorMessage}`
+      `[ERROR] ${code}: ${errorMessage}`,
     );
 
     // Don't expose internal error details in production
@@ -327,7 +327,7 @@ const app = new Elysia()
       // Decode Basic Auth credentials
       const base64Credentials = authHeader.slice(6); // Remove "Basic "
       const credentials = Buffer.from(base64Credentials, "base64").toString(
-        "utf-8"
+        "utf-8",
       );
       const [username, password] = credentials.split(":");
 
@@ -450,7 +450,7 @@ Most endpoints require authentication via Bearer token in the Authorization head
         },
       },
       path: "/openapi",
-    })
+    }),
   )
 
   // Mount routes
@@ -469,7 +469,7 @@ Most endpoints require authentication via Bearer token in the Authorization head
         .use(profileRoutes) // Profile at /api/profile/*
         .use(mediaRoutes) // Media management at /api/media/*
         .use(uploadthingRoutes) // UploadThing file uploads at /api/uploadthing/*
-        .use(settingsMediaUploadRoutes) // Media upload settings at /api/settings/media-upload/**
+        .use(settingsMediaUploadRoutes), // Media upload settings at /api/settings/media-upload/**
   )
 
   .group("/api", (app) => app.use(systemRoutes)) // System statistics at /api/system/*
@@ -509,7 +509,7 @@ Most endpoints require authentication via Bearer token in the Authorization head
           },
         },
       },
-    }
+    },
   )
 
   // Start server

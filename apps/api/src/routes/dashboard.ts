@@ -1,12 +1,12 @@
 import { Elysia, t } from "elysia";
-import * as dashboardService from "@backend/services/dashboard.service";
-import { requireAdmin, successResponse } from "@backend/lib/route-helpers";
+import * as dashboardService from "@api/services/dashboard.service";
+import { requireAdmin, successResponse } from "@api/lib/route-helpers";
 import {
   DashboardStatsSchema,
   RecentActivitySchema,
   ActivityQuerySchema,
 } from "@repo/types";
-import { PAGINATION } from "@backend/constants";
+import { PAGINATION } from "@api/constants";
 
 export const dashboardRoutes = new Elysia({ prefix: "/dashboard" })
   .derive(async ({ request: { headers } }) => {

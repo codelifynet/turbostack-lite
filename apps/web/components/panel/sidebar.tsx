@@ -544,19 +544,18 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             isCollapsed ? "justify-center px-2" : "justify-between px-4",
           )}
         >
-          {!isCollapsed ? (
-            <Link
-              href="/panel"
-              className="flex items-center gap-3 group transition-opacity duration-200 opacity-100"
-            >
-              <Image src="/logo.svg" alt="TurboStack Logo" width={32} height={32} />
-              <span className="font-bold text-base text-gray-900 dark:text-white">
-                TurboStack
-              </span>
-            </Link>
-          ) : (
-            <div className="opacity-0 pointer-events-none w-0 h-0 overflow-hidden" />
-          )}
+          <Link
+            href="/panel"
+            className={cn(
+              "flex items-center gap-3 group transition-opacity duration-200",
+              isCollapsed ? "opacity-0 pointer-events-none w-0 h-0 overflow-hidden" : "opacity-100"
+            )}
+          >
+            <Image src="/logo.svg" alt="TurboStack Logo" width={32} height={32} />
+            <span className="font-bold text-base text-gray-900 dark:text-white">
+              TurboStack
+            </span>
+          </Link>
           <button
             onClick={onToggle}
             className={cn(

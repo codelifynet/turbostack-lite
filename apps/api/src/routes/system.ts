@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import * as systemService from "@backend/services/system.service";
-import { requireAdmin, successResponse } from "@backend/lib/route-helpers";
+import * as systemService from "@api/services/system.service";
+import { requireAdmin, successResponse } from "@api/lib/route-helpers";
 
 export const systemRoutes = new Elysia({ prefix: "/system" })
   .derive(async ({ request: { headers } }) => {

@@ -1,6 +1,6 @@
 import { prisma } from "@repo/database";
-import { AppError } from "@backend/lib/errors";
-import { MEDIA_UPLOAD_DEFAULTS } from "@backend/constants";
+import { AppError } from "@api/lib/errors";
+import { MEDIA_UPLOAD_DEFAULTS } from "@api/constants";
 
 export interface MediaUploadSettingsDTO {
   maxFileSize: number;

@@ -3,9 +3,9 @@
  * Common utilities for route handlers
  */
 
-import { auth } from "@backend/lib/auth";
-import { AppError } from "@backend/lib/errors";
-import { PAGINATION } from "@backend/constants";
+import { auth } from "@api/lib/auth";
+import { AppError } from "@api/lib/errors";
+import { PAGINATION } from "@api/constants";
 
 // Elysia headers type - can be Record<string, string | undefined> or Headers object
 export type ElysiaHeaders = Record<string, string | undefined> | Headers;

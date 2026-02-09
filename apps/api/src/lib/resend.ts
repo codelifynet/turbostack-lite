@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { env } from "@backend/lib/env";
+import { env } from "@api/lib/env";
 
 /**
  * Resend client instance

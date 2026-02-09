@@ -1,12 +1,12 @@
 import { Elysia, t } from "elysia";
-import * as userService from "@backend/services/user.service";
-import { auth } from "@backend/lib/auth";
-import { AppError } from "@backend/lib/errors";
-import { generateRandomPassword } from "@backend/lib/utils";
-import { sendWelcomeEmail } from "@backend/emails";
-import { env } from "@backend/lib/env";
-import { PAGINATION } from "@backend/constants";
-import { requireAdmin, getSession } from "@backend/lib/route-helpers";
+import * as userService from "@api/services/user.service";
+import { auth } from "@api/lib/auth";
+import { AppError } from "@api/lib/errors";
+import { generateRandomPassword } from "@api/lib/utils";
+import { sendWelcomeEmail } from "@api/emails";
+import { env } from "@api/lib/env";
+import { PAGINATION } from "@api/constants";
+import { requireAdmin, getSession } from "@api/lib/route-helpers";
 
 export const usersRoutes = new Elysia({ prefix: "/users" })
   .derive(async ({ request: { headers } }) => {
