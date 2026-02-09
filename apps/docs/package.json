@@ -1,6 +1,6 @@
 {
 	"name": "docs",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"scripts": {
 		"dev": "npx mintlify@latest dev --port 4102 --no-open",
