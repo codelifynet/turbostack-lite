@@ -111,9 +111,9 @@ echo -e "${GREEN}📦 Committing version changes...${NC}"
 git add -A
 git commit -m "chore: bump version to ${VERSION}" || echo "No changes to commit"
 
-# Create tag
+# Create or update tag (move to current commit if tag already exists)
 echo -e "${GREEN}🏷️  Creating tag v${VERSION}...${NC}"
-git tag -a "v${VERSION}" -m "Release v${VERSION}"
+git tag -a -f "v${VERSION}" -m "Release v${VERSION}"
 
 # Ask if user wants to push
 echo -e "${GREEN}✅ Release v${VERSION} prepared successfully!${NC}"
