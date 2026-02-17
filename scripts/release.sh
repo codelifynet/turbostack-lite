@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Release script for TurboStack Lite
-# Usage: ./scripts/release.sh [version]
+# Usage: ./scripts/release.sh [version] [--allow-dirty]
 # Example: ./scripts/release.sh 1.0.0
+# Example: ./scripts/release.sh 1.1.0 --allow-dirty
 
 set -e
 
@@ -12,8 +13,16 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Get version from argument or prompt
-VERSION=${1:-""}
+# Parse args: first = version, optional second = --allow-dirty
+VERSION=""
+ALLOW_DIRTY=""
+for arg in "$@"; do
+  if [ "$arg" = "--allow-dirty" ]; then
+    ALLOW_DIRTY=1
+  elif [ -z "$VERSION" ] && [[ $arg =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    VERSION="$arg"
+  fi
+done
 
 if [ -z "$VERSION" ]; then
     echo -e "${YELLOW}Enter version number (e.g., 1.0.0):${NC}"
@@ -39,15 +48,37 @@ if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "development" ]; th
     fi
 fi
 
-# Check if working directory is clean
+# Check if working directory is clean (unless --allow-dirty)
 if ! git diff-index --quiet HEAD --; then
-    echo -e "${RED}Error: Working directory is not clean. Please commit or stash your changes.${NC}"
-    exit 1
+    if [ -n "$ALLOW_DIRTY" ]; then
+        echo -e "${YELLOW}Warning: Working directory has uncommitted changes (--allow-dirty).${NC}"
+    else
+        echo -e "${RED}Error: Working directory is not clean. Please commit or stash your changes.${NC}"
+        echo -e "${YELLOW}To run anyway: ./scripts/release.sh ${VERSION} --allow-dirty${NC}"
+        exit 1
+    fi
 fi
 
-# Update version in package.json files
+# Update version in package.json files (macOS: sed -i '', Linux: sed -i)
 echo -e "${GREEN}📝 Updating version in package.json files...${NC}"
-find . -name "package.json" -not -path "*/node_modules/*" -not -path "*/.next/*" -exec sed -i '' "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/g" {} \;
+run_sed() {
+  if [[ "$(uname)" == "Darwin" ]]; then
+    sed -i '' "$1" "$2"
+  else
+    sed -i "$1" "$2"
+  fi
+}
+find . -name "package.json" -not -path "*/node_modules/*" -not -path "*/.next/*" | while read -r f; do
+  run_sed "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/g" "$f"
+done
+
+# Update root package.json release scripts (release:version, release:tag)
+ROOT_PKG="package.json"
+if [ -f "$ROOT_PKG" ]; then
+  run_sed "s/echo 'v[0-9.]*'/echo 'v${VERSION}'/g" "$ROOT_PKG"
+  run_sed "s/v[0-9.]* -m 'Release v[0-9.]*'/v${VERSION} -m 'Release v${VERSION}'/g" "$ROOT_PKG"
+  run_sed "s/git push origin v[0-9.]*/git push origin v${VERSION}/g" "$ROOT_PKG"
+fi
 
 # Check if CHANGELOG.md exists and has entry for this version
 if [ -f "CHANGELOG.md" ]; then
@@ -96,9 +127,21 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     git push origin "${CURRENT_BRANCH}"
     git push origin "v${VERSION}"
     echo -e "${GREEN}✅ Pushed to remote!${NC}"
-    echo -e "${GREEN}🎉 Release v${VERSION} is now live!${NC}"
+    echo ""
+    echo -e "${YELLOW}📌 GitHub Release oluşturun:${NC}"
+    REPO_URL=$(git config --get remote.origin.url | sed 's/\.git$//' | sed 's/^git@github\.com:/https:\/\/github.com\//')
+    RELEASE_URL="${REPO_URL}/releases/new?tag=v${VERSION}"
+    echo -e "  1. ${RELEASE_URL}"
+    echo -e "  2. Tag: ${GREEN}v${VERSION}${NC} (zaten seçili olabilir)"
+    echo -e "  3. Release title: ${GREEN}v${VERSION}${NC}"
+    echo -e "  4. Description: CHANGELOG.md içindeki [${VERSION}] bölümünü kopyalayın"
+    echo -e "  5. 'Publish release' tıklayın"
+    echo ""
+    echo -e "${GREEN}🎉 Release v${VERSION} tag'i yayında. GitHub Release'i yukarıdaki adımlarla oluşturun.${NC}"
 else
     echo -e "${YELLOW}Remember to push manually:${NC}"
     echo -e "  git push origin ${CURRENT_BRANCH}"
     echo -e "  git push origin v${VERSION}"
+    echo ""
+    echo -e "${YELLOW}Push sonrası GitHub'da: Repo → Releases → Draft a new release → tag v${VERSION} → CHANGELOG bölümünü yapıştırın.${NC}"
 fi

@@ -29,6 +29,8 @@
 		"clean": "turbo run clean",
 		"ngrok": "ngrok http 4101",
 		"release:check": "bun run check-types && bun run lint && bun run build",
+		"release": "./scripts/release.sh",
+		"release:tag-push": "./scripts/tag-and-push.sh",
 		"release:version": "echo 'v1.1.0'",
 		"release:tag": "git tag -a v1.1.0 -m 'Release v1.1.0' && git push origin v1.1.0",
 		"prepare": "husky"

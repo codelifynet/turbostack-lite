@@ -28,15 +28,23 @@ bun run test
 
 ### 2. Git Commit and Tag
 
+**Seçenek A – Tam sürüm (versiyon bump + build + tag + push):**
 ```bash
-# Commit changes
+./scripts/release.sh 1.1.0
+# veya: bun run release -- 1.1.0
+```
+
+**Seçenek B – Versiyon zaten commit edildiyse (sadece tag + push):**
+```bash
+./scripts/tag-and-push.sh 1.1.0
+# veya: bun run release:tag-push -- 1.1.0
+```
+
+**Manuel:**
+```bash
 git add .
 git commit -m "chore: prepare v1.1.0 release"
-
-# Create tag
 git tag -a v1.1.0 -m "Release v1.1.0"
-
-# Push tag
 git push origin main
 git push origin v1.1.0
 ```
@@ -96,7 +104,7 @@ Thank you to everyone who contributed to this release!
 
 For future releases:
 
-1. Update versions in `package.json` files
-2. Add new version to `CHANGELOG.md`
-3. Create and push git tag
-4. Create GitHub release
+1. **Versiyon güncelle:** `./scripts/release.sh X.Y.Z` (tüm package.json + root release script'leri güncellenir)
+2. **CHANGELOG.md** – Yeni sürüm için `## [X.Y.Z]` bölümü ekleyin
+3. **Tag + push:** Script sırasında veya `./scripts/tag-and-push.sh X.Y.Z`
+4. **GitHub Release:** Script’in yazdırdığı linkten "Draft new release" → tag seçin → CHANGELOG bölümünü yapıştırın → Publish
