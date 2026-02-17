@@ -96,7 +96,7 @@ fi
 
 # Build the project
 echo -e "${GREEN}🔨 Building project...${NC}"
-bun install --frozen-lockfile
+bun install
 bun run build
 
 # Run tests if available
