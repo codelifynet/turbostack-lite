@@ -3,6 +3,11 @@
  * Centralized configuration values
  */
 
+export { CORS_DEFAULTS } from "./cors";
+export { ELYSIA_ERROR_MAP } from "./elysia-errors";
+export { getOpenApiDocumentation } from "./openapi";
+export { BLOCKED_PATH_PATTERNS } from "./security";
+
 // Rate limiting defaults
 export const RATE_LIMIT = {
   GLOBAL: {

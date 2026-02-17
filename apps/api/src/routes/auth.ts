@@ -1,18 +1,10 @@
 import { Elysia } from "elysia";
-import { rateLimit } from "elysia-rate-limit";
 import { auth } from "@api/lib/auth";
 import * as userService from "@api/services/user.service";
 import { AppError } from "@api/lib/errors";
-import { env } from "@api/lib/env";
-import { sendPasswordResetEmail } from "@api/emails";
-import { prisma } from "@repo/database";
-import { RATE_LIMIT } from "@api/constants";
-
-// Better-auth plugin - mounts auth.handler directly without additional middleware
 export const betterAuthPlugin = new Elysia({
   name: "better-auth",
 }).all("/api/auth/*", async ({ request }) => {
-  // Better-auth handles all /api/auth/* routes internally
   return auth.handler(request);
 });
 

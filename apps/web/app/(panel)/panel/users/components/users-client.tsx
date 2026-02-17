@@ -209,7 +209,7 @@ export function UsersClient({ initialUsers, initialStats }: UsersClientProps) {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [currentPage, pageSize, initialUsers, isRefreshing]);
+  }, [pageSize, initialUsers, isRefreshing]);
 
   useEffect(() => {
     loadUsers();

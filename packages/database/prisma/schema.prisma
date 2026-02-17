@@ -119,8 +119,7 @@ model UserSettings {
 // ============================================
 
 model MediaUploadSettings {
-  id        String   @id @default(cuid())
-  isGlobal  Boolean  @unique @default(true)
+  id        String   @id @default("global")
   maxFileSize   Int      @default(4)
   maxFileCount  Int      @default(10)
   allowedMimeTypes String[] @default(["image/jpeg", "image/png", "image/gif", "image/webp"])

@@ -140,15 +140,7 @@ export const TypingAnimation = ({
 
     const startTimeout = setTimeout(() => setStarted(true), delay);
     return () => clearTimeout(startTimeout);
-  }, [
-    delay,
-    startOnView,
-    isInView,
-    started,
-    sequence?.activeIndex,
-    sequence?.sequenceStarted,
-    itemIndex,
-  ]);
+  }, [delay, startOnView, isInView, started, sequence, itemIndex]);
 
   useEffect(() => {
     if (!started) return;

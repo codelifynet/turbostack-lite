@@ -50,7 +50,8 @@ export function BillingTab({ userRole }: BillingTabProps) {
         <Alert className="mb-6">
           <Info className="h-4 w-4" />
           <AlertDescription>
-            You're viewing your subscription in read-only mode. Contact support to make changes.
+            You&apos;re viewing your subscription in read-only mode. Contact
+            support to make changes.
           </AlertDescription>
         </Alert>
       )}

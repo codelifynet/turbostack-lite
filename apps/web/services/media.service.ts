@@ -1,7 +1,6 @@
 import { apiClient } from "@/lib/api";
 import type { ApiResponse } from "./types";
 import type { MediaFile, MediaListResponse } from "@repo/types";
-import { env } from "@/lib/env";
 
 export const mediaService = {
   async listFiles(params?: {
@@ -99,8 +98,7 @@ export const mediaService = {
 
       onProgress?.(10);
 
-      const apiUrl = env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/api/uploadthing`, {
+      const response = await fetch(`/api/uploadthing`, {
         method: "POST",
         body: formData,
         credentials: "include",

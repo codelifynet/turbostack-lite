@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Monorepo: packages/ui componentlerini tara */
-@source "../../../packages/ui/src/**/*.{ts,tsx}";
+/* Monorepo: packages/shadcn-ui componentlerini tara */
+@source "../../../packages/shadcn-ui/src/**/*.{ts,tsx}";
 
 @custom-variant dark (&:is(.dark *));
 

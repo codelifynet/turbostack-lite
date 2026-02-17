@@ -1,9 +1,9 @@
-# Release Checklist - v1.0.0
+# Release Checklist - v1.1.0
 
 ## ✅ Pre-Release Checklist
 
-- [x] All package versions updated (1.0.0)
-- [x] CHANGELOG.md created
+- [x] All package versions updated (1.1.0)
+- [x] CHANGELOG.md updated
 - [ ] Tests passed successfully
 - [ ] Documentation is up to date
 - [ ] Breaking changes documented
@@ -31,14 +31,14 @@ bun run test
 ```bash
 # Commit changes
 git add .
-git commit -m "chore: prepare v1.0.0 release"
+git commit -m "chore: prepare v1.1.0 release"
 
 # Create tag
-git tag -a v1.0.0 -m "Release v1.0.0"
+git tag -a v1.1.0 -m "Release v1.1.0"
 
 # Push tag
 git push origin main
-git push origin v1.0.0
+git push origin v1.1.0
 ```
 
 ### 3. Create GitHub Release
@@ -46,8 +46,8 @@ git push origin v1.0.0
 1. Go to GitHub repository
 2. Navigate to Releases page
 3. Click "Draft a new release"
-4. Select tag: `v1.0.0`
-5. Release title: `v1.0.0`
+4. Select tag: `v1.1.0`
+5. Release title: `v1.1.0`
 6. Description: Copy content from CHANGELOG.md
 7. Click "Publish release"
 
@@ -61,11 +61,11 @@ git push origin v1.0.0
 ## 📝 Release Notes Template
 
 ```markdown
-# v1.0.0 Release
+# v1.1.0 Release
 
-## 🎉 First Stable Release
+## 🎉 Minor Release
 
-TurboStack Lite's first major release is now available!
+New features and improvements.
 
 ### ✨ Features
 

@@ -81,14 +81,14 @@ async function main() {
   console.log("⚙️  Seeding global settings...");
 
   await prisma.mediaUploadSettings.upsert({
-    where: { isGlobal: true } as any,
+    where: { id: "global" },
     update: {},
     create: {
-      isGlobal: true,
+      id: "global",
       maxFileSize: 5,
       maxFileCount: 10,
       allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
-    } as any,
+    },
   });
   console.log("✅ Global settings seeded.\n");
 

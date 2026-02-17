@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense } from "react";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@repo/shadcn-ui/button";
@@ -63,7 +64,7 @@ function SuccessContent() {
 
       <CardContent className="space-y-4">
         <div className="rounded-lg bg-linear-to-br from-muted/50 to-muted/30 p-5 space-y-3 border border-border/50">
-          <h3 className="font-semibold text-lg">What's Next?</h3>
+          <h3 className="font-semibold text-lg">What&apos;s Next?</h3>
           <ul className="space-y-2.5 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">✓</span>
@@ -76,7 +77,7 @@ function SuccessContent() {
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">✓</span>
               <span>
-                You'll be added to the GitHub repository within 6 hours
+                You&apos;ll be added to the GitHub repository within 6 hours
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -92,10 +93,10 @@ function SuccessContent() {
           asChild
           className="flex-1 gradient-bg text-white hover:opacity-90"
         >
-          <a href="/panel">Go to Dashboard</a>
+          <Link href="/panel">Go to Dashboard</Link>
         </Button>
         <Button asChild variant="outline" className="flex-1">
-          <a href="/docs">View Docs</a>
+          <Link href="/docs">View Docs</Link>
         </Button>
       </CardFooter>
     </Card>

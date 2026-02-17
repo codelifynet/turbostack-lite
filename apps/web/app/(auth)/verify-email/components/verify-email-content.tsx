@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { CheckCircle, XCircle, Loader2, Mail } from "lucide-react";
 import { Button } from "@repo/shadcn-ui/button";
 import { AUTH_ENDPOINTS } from "@repo/types";
-import { env } from "@/lib/env";
 
 export function VerifyEmailContent() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export function VerifyEmailContent() {
       try {
         // Better-auth uses GET with token query param for email verification
         const response = await fetch(
-          `${env.NEXT_PUBLIC_API_URL}${AUTH_ENDPOINTS.verifyEmail}?token=${encodeURIComponent(token)}`,
+          `${AUTH_ENDPOINTS.verifyEmail}?token=${encodeURIComponent(token)}`,
           {
             method: "GET",
             credentials: "include",

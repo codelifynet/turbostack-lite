@@ -2,7 +2,15 @@ import { treaty } from "@elysiajs/eden";
 import type { App } from "@api/index";
 import { env } from "@/lib/env";
 
-const API_BASE_URL = env.NEXT_PUBLIC_API_URL;
+/**
+ * Use same-origin (relative) URL on the client side so requests go through
+ * Next.js rewrites → cookies are forwarded automatically.
+ * On the server side (SSR), use the full API URL directly.
+ */
+const isServer = typeof window === "undefined";
+const API_BASE_URL = isServer
+  ? env.NEXT_PUBLIC_API_URL // SSR: direct backend call
+  : window.location.origin; // Browser: same-origin → Next.js rewrites
 
 export const api = treaty<App>(API_BASE_URL, {
   fetch: {
@@ -12,22 +20,27 @@ export const api = treaty<App>(API_BASE_URL, {
 
 export const baseApi = api.api;
 
-// Traditional REST client wrapper for services that use standard HTTP methods
+/**
+ * Traditional REST client wrapper.
+ * Uses same-origin on the client for cookie forwarding.
+ */
+const getBaseUrl = () =>
+  typeof window === "undefined" ? env.NEXT_PUBLIC_API_URL : ""; // empty string = same origin (relative path)
+
 export const apiClient = {
   async get<T>(path: string): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getBaseUrl()}${path}`, {
       method: "GET",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    // Always return JSON response (includes error responses)
     return response.json();
   },
 
   async post<T>(path: string, data?: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getBaseUrl()}${path}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -35,12 +48,11 @@ export const apiClient = {
       },
       body: data ? JSON.stringify(data) : undefined,
     });
-    // Always return JSON response (includes error responses)
     return response.json();
   },
 
   async patch<T>(path: string, data?: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getBaseUrl()}${path}`, {
       method: "PATCH",
       credentials: "include",
       headers: {
@@ -48,19 +60,17 @@ export const apiClient = {
       },
       body: data ? JSON.stringify(data) : undefined,
     });
-    // Always return JSON response (includes error responses)
     return response.json();
   },
 
   async delete<T>(path: string): Promise<T | void> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(`${getBaseUrl()}${path}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    // DELETE might not return content
     const text = await response.text();
     return text ? JSON.parse(text) : undefined;
   },

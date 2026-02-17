@@ -188,7 +188,8 @@ export default function TermsOfServicePage() {
               9. Limitation of Liability
             </h2>
             <p className="text-muted-foreground mb-4">
-              Our services are provided "as is." We are not liable for:
+              Our services are provided &quot;as is.&quot; We are not liable
+              for:
             </p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
               <li>Service interruptions or technical issues</li>

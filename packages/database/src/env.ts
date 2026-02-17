@@ -28,5 +28,14 @@ export function loadDatabaseEnv(): void {
  */
 export function getDatabaseUrl(): string {
   loadDatabaseEnv();
-  return process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL;
+  const url = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL;
+
+  // Enhance security and avoid warnings for PostgreSQL connections
+  if (url.includes("postgresql://") && !url.includes("sslmode=")) {
+    return url.includes("?")
+      ? `${url}&sslmode=verify-full`
+      : `${url}?sslmode=verify-full`;
+  }
+
+  return url;
 }

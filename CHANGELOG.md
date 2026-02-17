@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-09
+
+### Added
+
+- **.agent/** – Agent kuralları ve yapılandırması (git ile takip ediliyor)
+- **Color settings** – Panel renk ayarları formu ve context
+- **API constants** – CORS, OpenAPI, rate-limit, security sabitleri
+- **Husky & lint-staged** – Commit öncesi lint/format kontrolleri
+- **packages/shadcn-ui** – UI bileşenleri paketi (packages/ui refactor sonrası)
+
+### Changed
+
+- **Auth formları** – Login, register, forgot-password, verify-email refactor
+- **Panel** – Dashboard, layout, mobile sidebar, system-stats iyileştirmeleri
+- **API** – Index refactor, auth/media route güncellemeleri
+- **Prisma** – Schema, seed ve MediaUploadSettings model güncellemeleri
+- **Dockerfile** – api ve web image güncellemeleri
+- **Docs** – development ve project-structure dokümanları güncellendi
+- **.gitignore** – .agent/ takip edilecek şekilde düzenlendi
+
+### Removed
+
+- **packages/ui** – Yerine packages/shadcn-ui kullanılıyor (internal refactor)
+
+### Fixed
+
+- Çeşitli UI ve API iyileştirmeleri
+
+---
+
 ## [1.0.0] - 2026-02-05
 
 ### 🎉 Initial Release
@@ -75,4 +105,5 @@ First stable release is now available!
 
 ---
 
+[1.1.0]: https://github.com/codelifynet/turbostack-lite/releases/tag/v1.1.0
 [1.0.0]: https://github.com/codelifynet/turbostack-lite/releases/tag/v1.0.0

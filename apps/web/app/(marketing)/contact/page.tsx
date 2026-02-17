@@ -49,7 +49,7 @@ export default function ContactPage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Have questions about TurboStack? Need a custom solution for your
-            team? We'd love to hear from you.
+            team? We&apos;d love to hear from you.
           </p>
         </div>
 
@@ -59,9 +59,9 @@ export default function ContactPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-6">Let's talk</h2>
               <p className="text-muted-foreground mb-8">
-                Whether you're interested in our Business plan, need technical
-                support, or want to explore partnership opportunities, we're
-                here to help.
+                Whether you&apos;re interested in our Business plan, need
+                technical support, or want to explore partnership opportunities,
+                we&apos;re here to help.
               </p>
             </div>
 

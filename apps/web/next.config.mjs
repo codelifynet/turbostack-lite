@@ -1,9 +1,3 @@
-import { fileURLToPath } from "node:url";
-import { resolve, dirname } from "node:path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('next').NextConfig} */

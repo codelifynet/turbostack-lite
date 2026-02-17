@@ -6,7 +6,13 @@ import { rateLimit } from "elysia-rate-limit";
 import { logger } from "@api/lib/logger";
 import { env } from "@api/lib/env";
 import { AppError } from "@api/lib/errors";
-import { RATE_LIMIT } from "@api/constants";
+import {
+  BLOCKED_PATH_PATTERNS,
+  CORS_DEFAULTS,
+  ELYSIA_ERROR_MAP,
+  getOpenApiDocumentation,
+  RATE_LIMIT,
+} from "@api/constants";
 import { auth } from "@api/lib/auth";
 import {
   healthRoutes,
@@ -30,30 +36,8 @@ const app = new Elysia()
     const url = new URL(request.url);
     const pathname = url.pathname.toLowerCase();
 
-    // List of sensitive paths/files to block
-    const blockedPatterns = [
-      /^\/\.env/,
-      /^\/\.git/,
-      /^\/\.vscode/,
-      /^\/node_modules/,
-      /^\/package\.json/,
-      /^\/package-lock\.json/,
-      /^\/bun\.lockb/,
-      /^\/yarn\.lock/,
-      /^\/pnpm-lock\.yaml/,
-      /^\/tsconfig/,
-      /^\/@vite/,
-      /^\/actutor/, // Common typo of actuator
-      /^\/actuator/,
-      /^\/debug/,
-      /\/\.env$/,
-      /\/\.git\//,
-      /\/config\.json$/,
-      /\/sftp\.json$/,
-    ];
-
     // Check if path matches any blocked pattern
-    for (const pattern of blockedPatterns) {
+    for (const pattern of BLOCKED_PATH_PATTERNS) {
       if (pattern.test(pathname)) {
         set.status = 404;
         return {
@@ -105,17 +89,7 @@ const app = new Elysia()
   .use(
     cors({
       origin: env.CORS_ORIGIN,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization", "x-request-id"],
-    }),
-  )
-
-  // Global rate limiting - 100 requests per minute
-  .use(
-    rateLimit({
-      duration: RATE_LIMIT.GLOBAL.duration,
-      max: RATE_LIMIT.GLOBAL.max,
+      ...CORS_DEFAULTS,
     }),
   )
 
@@ -245,28 +219,7 @@ const app = new Elysia()
       };
     }
 
-    const errorMap: Record<
-      string,
-      { status: number; error: string; message: string }
-    > = {
-      NOT_FOUND: {
-        status: 404,
-        error: "NOT_FOUND",
-        message: "The requested resource was not found",
-      },
-      PARSE: {
-        status: 400,
-        error: "VALIDATION_ERROR",
-        message: "Failed to parse request body",
-      },
-      INTERNAL_SERVER_ERROR: {
-        status: 500,
-        error: "INTERNAL_ERROR",
-        message: "An unexpected error occurred",
-      },
-    };
-
-    const errorInfo = errorMap[code] || {
+    const errorInfo = ELYSIA_ERROR_MAP[code] || {
       status: 500,
       error: "INTERNAL_ERROR",
       message: "An unexpected error occurred",
@@ -345,110 +298,7 @@ const app = new Elysia()
   })
   .use(
     openapi({
-      documentation: {
-        openapi: "3.1.0",
-        info: {
-          title: "TurboStack API",
-          version: "1.0.0",
-          description: `
-# TurboStack Backend API
-
-Modern full-stack starter kit API built with **Elysia.js** and **Bun** runtime.
-
-## Features
-- 🚀 High-performance Bun runtime
-- 🔐 JWT-based authentication
-- 📧 Email notifications with Resend
-- 💳 Payment integration with Polar
-- 📁 File uploads with UploadThing
-
-## Authentication
-Most endpoints require authentication via Bearer token in the Authorization header.
-          `,
-          termsOfService: "https://turbostack.pro/terms",
-          contact: {
-            name: "TurboStack Support",
-            email: "support@turbostack.pro",
-            url: "https://turbostack.pro",
-          },
-          license: {
-            name: "MIT",
-            url: "https://opensource.org/licenses/MIT",
-          },
-        },
-        servers: [
-          {
-            url: `http://localhost:${env.PORT}`,
-            description: "Development server",
-          },
-          {
-            url: "https://api.turbostack.pro",
-            description: "Production server",
-          },
-        ],
-        tags: [
-          {
-            name: "Health",
-            description: "Health check and monitoring endpoints",
-          },
-          {
-            name: "Auth",
-            description: "Authentication and authorization endpoints",
-          },
-          {
-            name: "Users",
-            description: "User management and profile endpoints",
-          },
-          {
-            name: "Media",
-            description: "File upload and media management",
-          },
-          {
-            name: "Tasks",
-            description: "Kanban task management endpoints",
-          },
-          {
-            name: "Versions",
-            description: "Version and changelog management endpoints",
-          },
-        ],
-        components: {
-          securitySchemes: {
-            bearerAuth: {
-              type: "http",
-              scheme: "bearer",
-              bearerFormat: "JWT",
-              description: "JWT token obtained from /auth/login",
-            },
-          },
-          schemas: {
-            Error: {
-              type: "object",
-              properties: {
-                success: { type: "boolean", example: false },
-                code: { type: "string", example: "VALIDATION_ERROR" },
-                message: { type: "string", example: "Invalid input data" },
-                status: { type: "integer", example: 400 },
-                requestId: {
-                  type: "string",
-                  example: "550e8400-e29b-41d4-a716-446655440000",
-                },
-              },
-            },
-            Success: {
-              type: "object",
-              properties: {
-                success: { type: "boolean", example: true },
-                data: { type: "object" },
-                requestId: {
-                  type: "string",
-                  example: "550e8400-e29b-41d4-a716-446655440000",
-                },
-              },
-            },
-          },
-        },
-      },
+      documentation: getOpenApiDocumentation(env.PORT),
       path: "/openapi",
     }),
   )
@@ -463,16 +313,22 @@ Most endpoints require authentication via Bearer token in the Authorization head
     "/api",
     (app) =>
       app
+        // Apply rate limiting to API routes (excludes Better Auth /api/auth/*)
+        .use(
+          rateLimit({
+            duration: RATE_LIMIT.GLOBAL.duration,
+            max: RATE_LIMIT.GLOBAL.max,
+          }),
+        )
         .use(authRoutes) // Protected user routes at /api/*
         .use(dashboardRoutes) // Dashboard stats at /api/dashboard/*
         .use(usersRoutes) // User management at /api/users/*
         .use(profileRoutes) // Profile at /api/profile/*
         .use(mediaRoutes) // Media management at /api/media/*
         .use(uploadthingRoutes) // UploadThing file uploads at /api/uploadthing/*
-        .use(settingsMediaUploadRoutes), // Media upload settings at /api/settings/media-upload/**
+        .use(settingsMediaUploadRoutes) // Media upload settings at /api/settings/media-upload/**
+        .use(systemRoutes), // System statistics at /api/system/*
   )
-
-  .group("/api", (app) => app.use(systemRoutes)) // System statistics at /api/system/*
 
   // Root endpoint
   .get(

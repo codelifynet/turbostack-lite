@@ -169,7 +169,7 @@ export function SupportClient() {
             <CardTitle>Contact Support</CardTitle>
           </div>
           <CardDescription>
-            Can't find what you're looking for? Send us a message
+            Can&apos;t find what you&apos;re looking for? Send us a message
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

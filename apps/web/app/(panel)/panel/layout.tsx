@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Sidebar, Header } from "@/components/panel";
 import { PanelFooter } from "@/components/panel/footer";
 import { useSession } from "@/lib/auth-client";
+import { ColorSettingsLoader } from "@/components/color-settings-loader";
 
 export default function PanelLayout({
   children,
@@ -26,6 +27,7 @@ export default function PanelLayout({
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col">
+      <ColorSettingsLoader />
       {/* Desktop Sidebar */}
       <div className="hidden md:block fixed left-0 top-0 h-full z-40">
         <Sidebar

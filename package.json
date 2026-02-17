@@ -1,6 +1,6 @@
 {
 	"name": "turbostack",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"private": true,
 	"packageManager": "bun@1.1.45",
 	"scripts": {
@@ -29,11 +29,23 @@
 		"clean": "turbo run clean",
 		"ngrok": "ngrok http 4101",
 		"release:check": "bun run check-types && bun run lint && bun run build",
-		"release:version": "echo 'v1.0.1'",
-		"release:tag": "git tag -a v1.0.1 -m 'Release v1.0.1' && git push origin v1.0.1"
+		"release:version": "echo 'v1.1.0'",
+		"release:tag": "git tag -a v1.1.0 -m 'Release v1.1.0' && git push origin v1.1.0",
+		"prepare": "husky"
+	},
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx}": [
+			"eslint --max-warnings 0 --fix",
+			"prettier --write"
+		],
+		"*.{json,md,mdx,css,scss,yml,yaml}": [
+			"prettier --write"
+		]
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
 		"prettier": "^3.7.4",
 		"turbo": "^2.8.1",
 		"typescript": "5.9.2"

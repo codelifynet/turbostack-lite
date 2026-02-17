@@ -16,7 +16,7 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY apps/docs/package.json ./apps/docs/
 COPY packages/database/package.json ./packages/database/
-COPY packages/ui/package.json ./packages/ui/
+COPY packages/shadcn-ui/package.json ./packages/shadcn-ui/
 COPY packages/types/package.json ./packages/types/
 COPY packages/validations/package.json ./packages/validations/
 COPY packages/eslint-config/package.json ./packages/eslint-config/

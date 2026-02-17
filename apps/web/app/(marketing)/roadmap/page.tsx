@@ -26,9 +26,9 @@ export default function RoadmapPage() {
               Development <span className="gradient-text">Roadmap</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              TurboStack is actively developed. You can follow what's planned,
-              what's in progress, and what's already shipped — transparently, in
-              real time.
+              TurboStack is actively developed. You can follow what&apos;s
+              planned, what&apos;s in progress, and what&apos;s already shipped
+              — transparently, in real time.
             </p>
           </div>
         </div>
@@ -37,8 +37,8 @@ export default function RoadmapPage() {
         <div className="bg-card rounded-lg border shadow-lg p-12 text-center">
           <h2 className="text-2xl font-semibold mb-4">Roadmap Coming Soon</h2>
           <p className="text-muted-foreground mb-6">
-            We're working on an interactive roadmap to show you what's coming
-            next.
+            We&apos;re working on an interactive roadmap to show you what&apos;s
+            coming next.
           </p>
           <Link href="/">
             <Button>View Home</Button>

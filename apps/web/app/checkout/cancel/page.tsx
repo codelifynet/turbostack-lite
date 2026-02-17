@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense } from "react";
 import { XCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@repo/shadcn-ui/button";
@@ -86,13 +87,13 @@ function CancelContent() {
           asChild
           className="w-full gradient-bg text-white hover:opacity-90"
         >
-          <a href="/#pricing">Try Again</a>
+          <Link href="/#pricing">Try Again</Link>
         </Button>
         <Button asChild variant="outline" className="w-full">
-          <a href="/" className="flex items-center justify-center gap-2">
+          <Link href="/" className="flex items-center justify-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
-          </a>
+          </Link>
         </Button>
       </CardFooter>
     </Card>

@@ -3,8 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@repo/shadcn-ui/sonner";
-import { ColorSettingsLoader } from "@/components/color-settings-loader";
+
 import { NotificationProvider } from "@/components/notification-provider";
+import { ColorSettingsProvider } from "@/lib/color-settings-context";
+import { ColorSettingsLoader } from "@/components/color-settings-loader";
 
 // Optimize font loading for faster builds
 const geistSans = localFont({
@@ -43,11 +45,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NotificationProvider>
+          <ColorSettingsProvider>
             <ColorSettingsLoader />
-            {children}
+            <NotificationProvider>{children}</NotificationProvider>
             <Toaster />
-          </NotificationProvider>
+          </ColorSettingsProvider>
         </ThemeProvider>
       </body>
     </html>

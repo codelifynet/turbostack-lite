@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { Mail, CheckCircle, ArrowLeft, AlertTriangle } from "lucide-react";
 import { AuthCard, Input, Button } from "@/components/auth";
 import { AUTH_ENDPOINTS } from "@repo/types";
-import { env } from "@/lib/env";
 
 const resendSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -37,13 +36,10 @@ export function ResendVerificationForm() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch(
-          `${env.NEXT_PUBLIC_API_URL}${AUTH_ENDPOINTS.session}`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`${AUTH_ENDPOINTS.session}`, {
+          method: "GET",
+          credentials: "include",
+        });
         const data = await response.json();
 
         if (data.authenticated && data.emailVerified) {
@@ -69,17 +65,14 @@ export function ResendVerificationForm() {
     setMessage("");
 
     try {
-      const response = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}${AUTH_ENDPOINTS.resendVerification}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(data),
+      const response = await fetch(`${AUTH_ENDPOINTS.resendVerification}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
 
       const result = await response.json();
 

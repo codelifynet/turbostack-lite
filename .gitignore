@@ -27,8 +27,10 @@ out/
 build
 dist
 
+
 # Opencode
 opencode.jsonc
+
 
 
 # Debug

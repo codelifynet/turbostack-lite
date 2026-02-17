@@ -32,7 +32,7 @@ export function Header({ user: initialUser }: HeaderProps) {
         id: session.user.id,
         email: session.user.email,
         name: session.user.name,
-        role: (session.user as any).role || "USER",
+        role: (session.user as { role?: string }).role || "USER",
         image: session.user.image,
       }
     : initialUser;

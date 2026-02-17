@@ -15,7 +15,6 @@ export async function getMediaUploadSettings(): Promise<MediaUploadSettingsDTO> 
     if (!settings) {
       settings = await prisma.mediaUploadSettings.create({
         data: {
-          isGlobal: true,
           maxFileSize: MEDIA_UPLOAD_DEFAULTS.MAX_FILE_SIZE,
           maxFileCount: MEDIA_UPLOAD_DEFAULTS.MAX_FILE_COUNT,
           allowedMimeTypes: [...MEDIA_UPLOAD_DEFAULTS.ALLOWED_MIME_TYPES],
@@ -50,7 +49,6 @@ export async function updateMediaUploadSettings(
     if (!existing) {
       existing = await prisma.mediaUploadSettings.create({
         data: {
-          isGlobal: true,
           maxFileSize: MEDIA_UPLOAD_DEFAULTS.MAX_FILE_SIZE,
           maxFileCount: MEDIA_UPLOAD_DEFAULTS.MAX_FILE_COUNT,
           allowedMimeTypes: [...MEDIA_UPLOAD_DEFAULTS.ALLOWED_MIME_TYPES],

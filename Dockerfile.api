@@ -45,9 +45,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=4101
 
-# Copy only runtime dependencies
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages ./packages
+# Copy node_modules from builder (includes prisma generate artifacts)
+COPY --from=builder /app/node_modules ./node_modules
+# Copy packages from builder (includes generated Prisma client)
+COPY --from=builder /app/packages ./packages
 # Copy application code
 COPY --from=builder /app/apps/api ./apps/api
 COPY --from=builder /app/package.json ./

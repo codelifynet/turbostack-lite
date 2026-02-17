@@ -62,7 +62,7 @@ export function ForgotPasswordForm() {
             <Mail className="w-8 h-8 text-white" />
           </div>
           <p className="text-sm text-muted-foreground mb-6">
-            Didn't receive the email? Check your spam folder or try again.
+            Didn&apos;t receive the email? Check your spam folder or try again.
           </p>
           <Button
             variant="secondary"

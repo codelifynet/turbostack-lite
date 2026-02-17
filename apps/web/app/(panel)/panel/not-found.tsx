@@ -4,18 +4,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@repo/shadcn-ui/ui/button";
 import { Card, CardContent } from "@repo/shadcn-ui/ui/card";
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   FileQuestion,
   LayoutDashboard,
   User,
   Settings,
-  HelpCircle
+  HelpCircle,
 } from "lucide-react";
 
 export default function PanelNotFound() {
   const router = useRouter();
-  
+
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4">
       <div className="max-w-2xl w-full">
@@ -37,7 +37,7 @@ export default function PanelNotFound() {
             <div className="mb-8">
               <h1 className="text-3xl font-bold mb-3">Page Not Found</h1>
               <p className="text-lg text-muted-foreground mb-2">
-                The panel page you're looking for doesn't exist.
+                The panel page you&apos;re looking for doesn&apos;t exist.
               </p>
               <p className="text-sm text-muted-foreground">
                 It may have been moved, deleted, or the URL might be incorrect.

@@ -38,7 +38,6 @@ export type MediaUploadSettingsSumAggregateOutputType = {
 
 export type MediaUploadSettingsMinAggregateOutputType = {
   id: string | null
-  isGlobal: boolean | null
   maxFileSize: number | null
   maxFileCount: number | null
   createdAt: Date | null
@@ -47,7 +46,6 @@ export type MediaUploadSettingsMinAggregateOutputType = {
 
 export type MediaUploadSettingsMaxAggregateOutputType = {
   id: string | null
-  isGlobal: boolean | null
   maxFileSize: number | null
   maxFileCount: number | null
   createdAt: Date | null
@@ -56,7 +54,6 @@ export type MediaUploadSettingsMaxAggregateOutputType = {
 
 export type MediaUploadSettingsCountAggregateOutputType = {
   id: number
-  isGlobal: number
   maxFileSize: number
   maxFileCount: number
   allowedMimeTypes: number
@@ -78,7 +75,6 @@ export type MediaUploadSettingsSumAggregateInputType = {
 
 export type MediaUploadSettingsMinAggregateInputType = {
   id?: true
-  isGlobal?: true
   maxFileSize?: true
   maxFileCount?: true
   createdAt?: true
@@ -87,7 +83,6 @@ export type MediaUploadSettingsMinAggregateInputType = {
 
 export type MediaUploadSettingsMaxAggregateInputType = {
   id?: true
-  isGlobal?: true
   maxFileSize?: true
   maxFileCount?: true
   createdAt?: true
@@ -96,7 +91,6 @@ export type MediaUploadSettingsMaxAggregateInputType = {
 
 export type MediaUploadSettingsCountAggregateInputType = {
   id?: true
-  isGlobal?: true
   maxFileSize?: true
   maxFileCount?: true
   allowedMimeTypes?: true
@@ -193,7 +187,6 @@ export type MediaUploadSettingsGroupByArgs<ExtArgs extends runtime.Types.Extensi
 
 export type MediaUploadSettingsGroupByOutputType = {
   id: string
-  isGlobal: boolean
   maxFileSize: number
   maxFileCount: number
   allowedMimeTypes: string[]
@@ -226,7 +219,6 @@ export type MediaUploadSettingsWhereInput = {
   OR?: Prisma.MediaUploadSettingsWhereInput[]
   NOT?: Prisma.MediaUploadSettingsWhereInput | Prisma.MediaUploadSettingsWhereInput[]
   id?: Prisma.StringFilter<"MediaUploadSettings"> | string
-  isGlobal?: Prisma.BoolFilter<"MediaUploadSettings"> | boolean
   maxFileSize?: Prisma.IntFilter<"MediaUploadSettings"> | number
   maxFileCount?: Prisma.IntFilter<"MediaUploadSettings"> | number
   allowedMimeTypes?: Prisma.StringNullableListFilter<"MediaUploadSettings">
@@ -236,7 +228,6 @@ export type MediaUploadSettingsWhereInput = {
 
 export type MediaUploadSettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  isGlobal?: Prisma.SortOrder
   maxFileSize?: Prisma.SortOrder
   maxFileCount?: Prisma.SortOrder
   allowedMimeTypes?: Prisma.SortOrder
@@ -246,7 +237,6 @@ export type MediaUploadSettingsOrderByWithRelationInput = {
 
 export type MediaUploadSettingsWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  isGlobal?: boolean
   AND?: Prisma.MediaUploadSettingsWhereInput | Prisma.MediaUploadSettingsWhereInput[]
   OR?: Prisma.MediaUploadSettingsWhereInput[]
   NOT?: Prisma.MediaUploadSettingsWhereInput | Prisma.MediaUploadSettingsWhereInput[]
@@ -255,11 +245,10 @@ export type MediaUploadSettingsWhereUniqueInput = Prisma.AtLeast<{
   allowedMimeTypes?: Prisma.StringNullableListFilter<"MediaUploadSettings">
   createdAt?: Prisma.DateTimeFilter<"MediaUploadSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MediaUploadSettings"> | Date | string
-}, "id" | "isGlobal">
+}, "id">
 
 export type MediaUploadSettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  isGlobal?: Prisma.SortOrder
   maxFileSize?: Prisma.SortOrder
   maxFileCount?: Prisma.SortOrder
   allowedMimeTypes?: Prisma.SortOrder
@@ -277,7 +266,6 @@ export type MediaUploadSettingsScalarWhereWithAggregatesInput = {
   OR?: Prisma.MediaUploadSettingsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.MediaUploadSettingsScalarWhereWithAggregatesInput | Prisma.MediaUploadSettingsScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"MediaUploadSettings"> | string
-  isGlobal?: Prisma.BoolWithAggregatesFilter<"MediaUploadSettings"> | boolean
   maxFileSize?: Prisma.IntWithAggregatesFilter<"MediaUploadSettings"> | number
   maxFileCount?: Prisma.IntWithAggregatesFilter<"MediaUploadSettings"> | number
   allowedMimeTypes?: Prisma.StringNullableListFilter<"MediaUploadSettings">
@@ -287,7 +275,6 @@ export type MediaUploadSettingsScalarWhereWithAggregatesInput = {
 
 export type MediaUploadSettingsCreateInput = {
   id?: string
-  isGlobal?: boolean
   maxFileSize?: number
   maxFileCount?: number
   allowedMimeTypes?: Prisma.MediaUploadSettingsCreateallowedMimeTypesInput | string[]
@@ -297,7 +284,6 @@ export type MediaUploadSettingsCreateInput = {
 
 export type MediaUploadSettingsUncheckedCreateInput = {
   id?: string
-  isGlobal?: boolean
   maxFileSize?: number
   maxFileCount?: number
   allowedMimeTypes?: Prisma.MediaUploadSettingsCreateallowedMimeTypesInput | string[]
@@ -307,7 +293,6 @@ export type MediaUploadSettingsUncheckedCreateInput = {
 
 export type MediaUploadSettingsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxFileSize?: Prisma.IntFieldUpdateOperationsInput | number
   maxFileCount?: Prisma.IntFieldUpdateOperationsInput | number
   allowedMimeTypes?: Prisma.MediaUploadSettingsUpdateallowedMimeTypesInput | string[]
@@ -317,7 +302,6 @@ export type MediaUploadSettingsUpdateInput = {
 
 export type MediaUploadSettingsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxFileSize?: Prisma.IntFieldUpdateOperationsInput | number
   maxFileCount?: Prisma.IntFieldUpdateOperationsInput | number
   allowedMimeTypes?: Prisma.MediaUploadSettingsUpdateallowedMimeTypesInput | string[]
@@ -327,7 +311,6 @@ export type MediaUploadSettingsUncheckedUpdateInput = {
 
 export type MediaUploadSettingsCreateManyInput = {
   id?: string
-  isGlobal?: boolean
   maxFileSize?: number
   maxFileCount?: number
   allowedMimeTypes?: Prisma.MediaUploadSettingsCreateallowedMimeTypesInput | string[]
@@ -337,7 +320,6 @@ export type MediaUploadSettingsCreateManyInput = {
 
 export type MediaUploadSettingsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxFileSize?: Prisma.IntFieldUpdateOperationsInput | number
   maxFileCount?: Prisma.IntFieldUpdateOperationsInput | number
   allowedMimeTypes?: Prisma.MediaUploadSettingsUpdateallowedMimeTypesInput | string[]
@@ -347,7 +329,6 @@ export type MediaUploadSettingsUpdateManyMutationInput = {
 
 export type MediaUploadSettingsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  isGlobal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxFileSize?: Prisma.IntFieldUpdateOperationsInput | number
   maxFileCount?: Prisma.IntFieldUpdateOperationsInput | number
   allowedMimeTypes?: Prisma.MediaUploadSettingsUpdateallowedMimeTypesInput | string[]
@@ -357,7 +338,6 @@ export type MediaUploadSettingsUncheckedUpdateManyInput = {
 
 export type MediaUploadSettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  isGlobal?: Prisma.SortOrder
   maxFileSize?: Prisma.SortOrder
   maxFileCount?: Prisma.SortOrder
   allowedMimeTypes?: Prisma.SortOrder
@@ -372,7 +352,6 @@ export type MediaUploadSettingsAvgOrderByAggregateInput = {
 
 export type MediaUploadSettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  isGlobal?: Prisma.SortOrder
   maxFileSize?: Prisma.SortOrder
   maxFileCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -381,7 +360,6 @@ export type MediaUploadSettingsMaxOrderByAggregateInput = {
 
 export type MediaUploadSettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  isGlobal?: Prisma.SortOrder
   maxFileSize?: Prisma.SortOrder
   maxFileCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -414,7 +392,6 @@ export type MediaUploadSettingsUpdateallowedMimeTypesInput = {
 
 export type MediaUploadSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  isGlobal?: boolean
   maxFileSize?: boolean
   maxFileCount?: boolean
   allowedMimeTypes?: boolean
@@ -424,7 +401,6 @@ export type MediaUploadSettingsSelect<ExtArgs extends runtime.Types.Extensions.I
 
 export type MediaUploadSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  isGlobal?: boolean
   maxFileSize?: boolean
   maxFileCount?: boolean
   allowedMimeTypes?: boolean
@@ -434,7 +410,6 @@ export type MediaUploadSettingsSelectCreateManyAndReturn<ExtArgs extends runtime
 
 export type MediaUploadSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  isGlobal?: boolean
   maxFileSize?: boolean
   maxFileCount?: boolean
   allowedMimeTypes?: boolean
@@ -444,7 +419,6 @@ export type MediaUploadSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime
 
 export type MediaUploadSettingsSelectScalar = {
   id?: boolean
-  isGlobal?: boolean
   maxFileSize?: boolean
   maxFileCount?: boolean
   allowedMimeTypes?: boolean
@@ -452,14 +426,13 @@ export type MediaUploadSettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MediaUploadSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "isGlobal" | "maxFileSize" | "maxFileCount" | "allowedMimeTypes" | "createdAt" | "updatedAt", ExtArgs["result"]["mediaUploadSettings"]>
+export type MediaUploadSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "maxFileSize" | "maxFileCount" | "allowedMimeTypes" | "createdAt" | "updatedAt", ExtArgs["result"]["mediaUploadSettings"]>
 
 export type $MediaUploadSettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "MediaUploadSettings"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    isGlobal: boolean
     maxFileSize: number
     maxFileCount: number
     allowedMimeTypes: string[]
@@ -889,7 +862,6 @@ export interface Prisma__MediaUploadSettingsClient<T, Null = never, ExtArgs exte
  */
 export interface MediaUploadSettingsFieldRefs {
   readonly id: Prisma.FieldRef<"MediaUploadSettings", 'String'>
-  readonly isGlobal: Prisma.FieldRef<"MediaUploadSettings", 'Boolean'>
   readonly maxFileSize: Prisma.FieldRef<"MediaUploadSettings", 'Int'>
   readonly maxFileCount: Prisma.FieldRef<"MediaUploadSettings", 'Int'>
   readonly allowedMimeTypes: Prisma.FieldRef<"MediaUploadSettings", 'String[]'>

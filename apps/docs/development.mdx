@@ -124,10 +124,10 @@ This guide covers everything you need to know for daily development with TurboSt
 
 <Steps>
   <Step title="Create Component">
-    Add component to `packages/ui/src/`:
+    Add component to `packages/shadcn-ui/src/`:
 
     ```tsx
-    // packages/ui/src/input.tsx
+    // packages/shadcn-ui/src/input.tsx
     import * as React from "react";
 
     export interface InputProps
@@ -144,7 +144,7 @@ This guide covers everything you need to know for daily development with TurboSt
   </Step>
 
   <Step title="Export Component">
-    Add to `packages/ui/src/index.ts`:
+    Add to `packages/shadcn-ui/src/index.ts`:
 
     ```typescript
     export { Input, type InputProps } from "./input";

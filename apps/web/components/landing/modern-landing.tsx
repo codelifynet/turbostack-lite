@@ -148,7 +148,7 @@ export function ModernLanding() {
               colors={["#8b5cf6", "#a855f7", "#ec4899", "#3b82f6"]}
               speed={0.8}
             >
-              shouldn't break when you use AI
+              shouldn&apos;t break when you use AI
             </AuroraText>
           </h1>
 
@@ -609,7 +609,7 @@ export function ModernLanding() {
                   ))}
                 </div>
                 <p className="text-muted-foreground mb-4 italic">
-                  "{testimonial.quote}"
+                  &ldquo;{testimonial.quote}&rdquo;
                 </p>
                 <div className="font-semibold group-hover:text-primary transition-colors">
                   — {testimonial.author}
