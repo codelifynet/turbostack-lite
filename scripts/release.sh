@@ -125,7 +125,7 @@ read -p "Push to remote now? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     git push origin "${CURRENT_BRANCH}"
-    git push origin "v${VERSION}"
+    git push origin "v${VERSION}" --force
     echo -e "${GREEN}✅ Pushed to remote!${NC}"
     echo ""
     echo -e "${YELLOW}📌 GitHub Release oluşturun:${NC}"
@@ -141,7 +141,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 else
     echo -e "${YELLOW}Remember to push manually:${NC}"
     echo -e "  git push origin ${CURRENT_BRANCH}"
-    echo -e "  git push origin v${VERSION}"
+    echo -e "  git push origin v${VERSION} --force"
     echo ""
     echo -e "${YELLOW}Push sonrası GitHub'da: Repo → Releases → Draft a new release → tag v${VERSION} → CHANGELOG bölümünü yapıştırın.${NC}"
 fi
